@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Kartama Point" />
+  <title>Kartama Point — POS & Management</title>
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --surface: #ffffff;
+      --surface-2: #f9f9fb;
+      --text: #1c1c1e;
+      --text-secondary: #6e6e73;
+      --border: rgba(60, 60, 67, 0.14);
+      --accent: #007aff;
+      --accent-soft: rgba(0, 122, 255, 0.12);
+      --green: #34c759;
+      --green-soft: rgba(52, 199, 89, 0.14);
+      --orange: #ff9500;
+      --orange-soft: rgba(255, 149, 0, 0.14);
+      --red: #ff3b30;
+      --red-soft: rgba(255, 59, 48, 0.14);
+      --purple: #5856d6;
+      --purple-soft: rgba(88, 86, 214, 0.14);
+      --glass: rgba(255, 255, 255, 0.8);
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    [data-theme="dark"] {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --surface-2: #2c2c2e;
+      --text: #f5f5f7;
+      --text-secondary: #98989d;
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #0a84ff;
+      --accent-soft: rgba(10, 132, 255, 0.18);
+      --green: #30d158;
+      --green-soft: rgba(48, 209, 88, 0.18);
+      --orange: #ff9f0a;
+      --orange-soft: rgba(255, 159, 10, 0.18);
+      --red: #ff453a;
+      --red-soft: rgba(255, 69, 58, 0.18);
+      --purple: #5e5ce6;
+      --purple-soft: rgba(94, 92, 230, 0.18);
+      --glass: rgba(28, 28, 30, 0.82);
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* LOGIN VIEW */
+    #login-view {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom));
+      background: radial-gradient(circle at top right, var(--accent-soft), transparent 55%), var(--bg);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 36px 28px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .brand-logo {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 14px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #007aff, #5856d6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 28px;
+      letter-spacing: -0.5px;
+      box-shadow: 0 10px 24px rgba(0, 122, 255, 0.32);
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      margin: 0 0 28px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      margin-top: 8px;
+      box-shadow: 0 6px 16px rgba(0, 122, 255, 0.25);
+    }
+
+    .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: var(--radius-sm); }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-orange { background: var(--orange); color: #fff; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-purple { background: var(--purple); color: #fff; }
+    .btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+
+    .error-msg {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 18px;
+    }
+
+    /* APP SHELL */
+    #app-view { display: none; min-height: 100vh; }
+    .app-layout { display: flex; min-height: 100vh; }
+
+    /* Sidebar for iPad / Desktop */
+    .sidebar {
+      display: none;
+      width: 250px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
+      padding: calc(20px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      z-index: 40;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px 24px;
+    }
+
+    .sidebar-logo {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #007aff, #5856d6);
+      color: #fff;
+      font-weight: 800; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .nav-list { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none; background: transparent;
+      text-align: left; width: 100%;
+    }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent); }
+
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: calc(84px + var(--safe-bottom));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: calc(14px + var(--safe-top)) 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar h1 { font-size: 19px; font-weight: 700; margin: 0; letter-spacing: -0.4px; }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+    .badge-green { background: var(--green-soft); color: var(--green); }
+    .badge-orange { background: var(--orange-soft); color: var(--orange); }
+    .badge-red { background: var(--red-soft); color: var(--red); }
+    .badge-purple { background: var(--purple-soft); color: var(--purple); }
+
+    .content-container {
+      padding: 18px 18px 28px;
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 40;
+      background: var(--glass);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 6px calc(8px + var(--safe-bottom));
+    }
+
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .tab-btn.active { color: var(--accent); }
+    .tab-icon { font-size: 19px; line-height: 1; }
+
+    @media (min-width: 768px) {
+      .sidebar { display: flex; }
+      .bottom-bar { display: none; }
+      .main-area { margin-left: 250px; padding-bottom: 24px; }
+      .content-container { padding: 24px 28px; }
+    }
+
+    /* Grids & Cards */
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; }
+    @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+    .stat-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 6px; }
+    .stat-value { font-size: 19px; font-weight: 700; letter-spacing: -0.4px; }
+
+    /* PS4 */
+    .ps-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .status-pill { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .status-idle { background: var(--surface-2); color: var(--text-secondary); }
+    .status-playing { background: var(--green-soft); color: var(--green); }
+    .status-paused { background: var(--orange-soft); color: var(--orange); }
+
+    .timer-display { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.8px; margin: 6px 0; }
+    .billing-box { background: var(--surface-2); border-radius: var(--radius-md); padding: 12px; margin: 12px 0; font-size: 13px; }
+    .billing-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .billing-row:last-child { margin-bottom: 0; padding-top: 6px; border-top: 1px dashed var(--border); font-weight: 700; font-size: 15px; }
+    .control-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* POS Layout */
+    .pos-layout { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 920px) { .pos-layout { grid-template-columns: 1.55fr 1fr; } }
+
+    .snack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; margin-top: 12px; }
+
+    .snack-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      transition: transform 0.1s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .snack-item.clickable { cursor: pointer; }
+    .snack-item.clickable:active { transform: scale(0.97); }
+    .snack-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .snack-price { font-size: 13px; color: var(--accent); font-weight: 700; }
+    .snack-stock { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .qty-controls { display: flex; align-items: center; gap: 8px; }
+    .qty-btn {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+    .history-item:last-child { border-bottom: none; }
+
+    .chip-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .chip {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .form-row { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
+    @media (min-width: 600px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+
+    label.field-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-view">
+    <div class="login-card">
+      <div class="brand-logo">KP</div>
+      <h1 class="brand-title">Kartama Point</h1>
+      <form id="login-form" autocomplete="off">
+        <div class="input-group">
+          <input type="text" id="login-id" class="input-field" placeholder="ID Pengguna" required autocapitalize="none" />
+        </div>
+        <div class="input-group">
+          <input type="password" id="login-psw" class="input-field" placeholder="Kata Sandi" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Masuk</button>
+        <div id="login-error" class="error-msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION -->
+  <div id="app-view">
+    <div class="app-layout">
+      <!-- iPad / Desktop Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">KP</div>
+          <div>
+            <div style="font-weight:700;font-size:16px;">Kartama Point</div>
+            <div style="font-size:12px;color:var(--text-secondary);" id="sidebar-role">Role</div>
+          </div>
+        </div>
+        <nav class="nav-list" id="sidebar-nav"></nav>
+        <button class="btn btn-ghost btn-sm" onclick="logout()" style="width:100%;">Keluar</button>
+      </aside>
+
+      <!-- Main Area -->
+      <div class="main-area">
+        <header class="topbar">
+          <div>
+            <h1 id="page-title">Dashboard</h1>
+          </div>
+          <div class="topbar-actions">
+            <span class="badge" id="role-badge">ROLE</span>
+            <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Ganti Tema">🌓</button>
+            <button class="btn btn-ghost btn-sm" onclick="logout()">Keluar</button>
+          </div>
+        </header>
+
+        <main class="content-container">
+          <!-- SUMMARY STRIP (Dynamic per Role) -->
+          <div class="grid-3" style="margin-bottom:18px;" id="stats-strip"></div>
+
+          <!-- SECTION 1: RENTAL PS4 (ID 1 & ID 2) -->
+          <section id="sec-ps4" class="section">
+            <div class="grid-2" id="ps4-container"></div>
+          </section>
+
+          <!-- SECTION 2: WARUNG JAJAN NON-ROKOK (ID 1 & ID 2) -->
+          <section id="sec-warung" class="section">
+            <div class="pos-layout">
+              <div class="card">
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                  <input type="text" id="snack-search" class="input-field" placeholder="Cari jajanan / minuman..." oninput="renderSnacks()" style="flex:1;padding:10px 14px;" />
+                  <button id="btn-add-snack" class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddSnackModal()">+ Item Warung</button>
+                </div>
+                <div class="chip-group" id="snack-categories">
+                  <button class="chip active" onclick="setSnackCat('Semua', this)">Semua</button>
+                  <button class="chip" onclick="setSnackCat('Minuman', this)">Minuman</button>
+                  <button class="chip" onclick="setSnackCat('Makanan', this)">Makanan</button>
+                  <button class="chip" onclick="setSnackCat('Camilan', this)">Camilan</button>
+                </div>
+                <div class="snack-grid" id="snack-grid"></div>
+              </div>
+
+              <div class="card">
+                <h3 style="margin:0 0 12px;font-size:17px;">Keranjang Jajan</h3>
+                <div id="cart-list" style="min-height:120px;"></div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+                  <div style="display:flex;justify-content:space-between;font-weight:700;font-size:17px;margin-bottom:12px;">
+                    <span>Total</span>
+                    <span id="cart-total">Rp 0</span>
+                  </div>
+                  <div class="form-row">
+                    <button class="btn btn-primary" style="margin-top:0;" onclick="checkoutCart('cash')">Bayar Tunai / QRIS</button>
+                    <div style="display:flex;gap:8px;">
+                      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="checkoutCart('ps1')">+ Tagihan PS4 #1</button>
+                      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="checkoutCart('ps2')">+ Tagihan PS4 #2</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 3: TRANSAKSI DIGITAL (ID 1 & ID 2) -->
+          <section id="sec-digital" class="section">
+            <div class="grid-2">
+              <div class="card">
+                <h3 style="margin:0 0 14px;font-size:17px;">Catat Transaksi Digital</h3>
+                <div class="form-row">
+                  <div>
+                    <label class="field-label">Jenis Layanan</label>
+                    <select id="dig-type" class="input-field">
+                      <option value="Tarik Tunai BRI">Tarik Tunai BRI</option>
+                      <option value="Transfer Bank">Transfer Bank</option>
+                      <option value="Top Up E-Wallet (DANA/OVO/GoPay)">Top Up E-Wallet (DANA/OVO/GoPay)</option>
+                      <option value="Token Listrik PLN">Token Listrik PLN</option>
+                      <option value="Pulsa & Paket Data">Pulsa & Paket Data</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="field-label">Keterangan / No. Tujuan</label>
+                    <input type="text" id="dig-note" class="input-field" placeholder="Contoh: BRI a.n Budi / ID Meter" />
+                  </div>
+                </div>
+                <div class="form-row form-row-2">
+                  <div>
+                    <label class="field-label">Nominal Pokok (Rp)</label>
+                    <input type="number" id="dig-amount" class="input-field" placeholder="100000" />
+                  </div>
+                  <div>
+                    <label class="field-label">Biaya Admin / Laba (Rp)</label>
+                    <input type="number" id="dig-fee" class="input-field" placeholder="5000" />
+                  </div>
+                </div>
+                <button class="btn btn-primary" onclick="addDigitalTx()">Simpan Transaksi</button>
+              </div>
+
+              <div class="card">
+                <h3 style="margin:0 0 14px;font-size:17px;">Riwayat Digital Hari Ini</h3>
+                <div id="digital-history"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 4: KASIR ROKOK KHUSUS (ID 3 & ID 1) -->
+          <section id="sec-rokok-pos" class="section">
+            <div class="pos-layout">
+              <div class="card">
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                  <input type="text" id="cig-search" class="input-field" placeholder="Cari merk rokok..." oninput="renderCigarettes()" style="flex:1;padding:10px 14px;" />
+                  <button class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddCigModal()">+ Merk Rokok</button>
+                </div>
+                <div class="chip-group" id="cig-categories">
+                  <button class="chip active" onclick="setCigCat('Semua', this)">Semua</button>
+                  <button class="chip" onclick="setCigCat('Filter / SKM', this)">Filter / SKM</button>
+                  <button class="chip" onclick="setCigCat('Kretek / SKT', this)">Kretek / SKT</button>
+                  <button class="chip" onclick="setCigCat('Mild / Putih', this)">Mild / Putih</button>
+                </div>
+                <div class="snack-grid" id="cig-grid"></div>
+              </div>
+
+              <div class="card">
+                <h3 style="margin:0 0 12px;font-size:17px;">Kasir Penjualan Rokok</h3>
+                <div id="cig-cart-list" style="min-height:120px;"></div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+                  <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-bottom:4px;">
+                    <span>Estimasi Laba Bersih</span>
+                    <span id="cig-cart-profit" style="color:var(--green);font-weight:700;">Rp 0</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-weight:700;font-size:18px;margin-bottom:12px;">
+                    <span>Total Tagihan</span>
+                    <span id="cig-cart-total">Rp 0</span>
+                  </div>
+                  <div class="form-row">
+                    <button class="btn btn-green" style="width:100%;" onclick="checkoutCigCart('Tunai')">Bayar Tunai</button>
+                    <div style="display:flex;gap:8px;">
+                      <button class="btn btn-primary btn-sm" style="flex:1;margin-top:0;" onclick="checkoutCigCart('QRIS')">Bayar QRIS</button>
+                      <button class="btn btn-orange btn-sm" style="flex:1;" onclick="checkoutCigCart('Kasbon')">Catat Kasbon</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 5: STOK & RESTICK ROKOK (ID 3 & ID 1) -->
+          <section id="sec-rokok-stok" class="section">
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+                <div>
+                  <h3 style="margin:0;font-size:17px;">Manajemen Stok & Restock Rokok</h3>
+                  <div style="font-size:12px;color:var(--text-secondary);">Pantau stok bungkus, eceran batang, modal HPP, dan peringatan stok menipis</div>
+                </div>
+                <button class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddCigModal()">+ Tambah Merk</button>
+              </div>
+              <div id="cig-stock-list"></div>
+            </div>
+          </section>
+
+          <!-- SECTION 6: KASBON & REKAP ROKOK (ID 3 & ID 1) -->
+          <section id="sec-rokok-kasbon" class="section">
+            <div class="grid-2">
+              <div class="card">
+                <h3 style="margin:0 0 14px;font-size:17px;">Daftar Kasbon Rokok</h3>
+                <div id="cig-kasbon-list"></div>
+              </div>
+              <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                  <h3 style="margin:0;font-size:17px;">Riwayat Penjualan Rokok</h3>
+                  <button class="btn btn-ghost btn-sm" onclick="exportCigCSV()">Ekspor CSV</button>
+                </div>
+                <div id="cig-history-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 7: LAPORAN GABUNGAN OWNER (ID 1) & LAPORAN SHIFT (ID 2) -->
+          <section id="sec-laporan" class="section">
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+                <div>
+                  <h3 style="margin:0;font-size:17px;" id="laporan-title">Laporan Transaksi</h3>
+                  <div style="font-size:12px;color:var(--text-secondary);" id="laporan-subtitle"></div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-ghost btn-sm" onclick="exportAllCSV()">Ekspor CSV</button>
+                  <button id="btn-clear-history" class="btn btn-red btn-sm" onclick="clearHistory()">Reset Semua Data</button>
+                </div>
+              </div>
+              <div class="chip-group" id="owner-report-filters" style="margin-bottom:12px;display:none;">
+                <button class="chip active" onclick="setReportFilter('Semua', this)">Semua Lini</button>
+                <button class="chip" onclick="setReportFilter('Rental PS4', this)">Rental PS4</button>
+                <button class="chip" onclick="setReportFilter('Warung Jajan', this)">Warung Jajan</button>
+                <button class="chip" onclick="setReportFilter('Digital', this)">Digital</button>
+                <button class="chip" onclick="setReportFilter('Rokok', this)">Penjualan Rokok</button>
+              </div>
+              <div id="all-history"></div>
+            </div>
+          </section>
+
+          <!-- SECTION 8: PENGATURAN OWNER (KHUSUS ID 1) -->
+          <section id="sec-pengaturan" class="section">
+            <div class="grid-2">
+              <div class="card">
+                <h3 style="margin:0 0 14px;font-size:17px;">Kontrol Owner — Tarif & Akses</h3>
+                <div class="form-row">
+                  <div>
+                    <label class="field-label">Tarif Rental PS4 Per Jam (Rp)</label>
+                    <input type="number" id="set-rate" class="input-field" />
+                  </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()">Simpan Tarif PS4</button>
+              </div>
+
+              <div class="card">
+                <h3 style="margin:0 0 14px;font-size:17px;">Daftar Kredensial Akun</h3>
+                <div class="billing-box" style="margin-top:0;">
+                  <div class="billing-row"><span>ID 1 (Owner Lengkap)</span><strong>owner / 1234</strong></div>
+                  <div class="billing-row"><span>ID 2 (Admin PS4, Warung, Digital)</span><strong>admin / 1234</strong></div>
+                  <div class="billing-row"><span>ID 3 (Khusus Kasir Rokok)</span><strong>rokok / 1234</strong></div>
+                </div>
+                <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin:10px 0 0;">
+                  Untuk iPhone & iPad: buka di Safari → ketuk <strong>Share</strong> → <strong>Tambah ke Layar Utama</strong> agar tampil fullscreen seperti aplikasi iOS.
+                </p>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- iPhone Bottom Tab Bar -->
+    <nav class="bottom-bar" id="bottom-bar"></nav>
+  </div>
+
+  <!-- MODAL TAMBAH ITEM WARUNG (NON-ROKOK) -->
+  <div id="snack-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:60;align-items:center;justify-content:center;padding:20px;">
+    <div class="card" style="width:100%;max-width:380px;">
+      <h3 style="margin:0 0 14px;">Tambah Item Warung</h3>
+      <div class="form-row">
+        <input type="text" id="new-snack-name" class="input-field" placeholder="Nama jajanan / minuman" />
+        <select id="new-snack-cat" class="input-field">
+          <option value="Minuman">Minuman</option>
+          <option value="Makanan">Makanan</option>
+          <option value="Camilan">Camilan</option>
+        </select>
+        <input type="number" id="new-snack-price" class="input-field" placeholder="Harga jual (Rp)" />
+        <input type="number" id="new-snack-stock" class="input-field" placeholder="Stok awal" value="20" />
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeAddSnackModal()">Batal</button>
+        <button class="btn btn-primary" style="flex:1;margin-top:0;" onclick="saveNewSnack()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH MERK ROKOK -->
+  <div id="cig-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:60;align-items:center;justify-content:center;padding:20px;">
+    <div class="card" style="width:100%;max-width:400px;">
+      <h3 style="margin:0 0 14px;">Tambah Merk Rokok Baru</h3>
+      <div class="form-row">
+        <input type="text" id="new-cig-name" class="input-field" placeholder="Nama Merk (cth: Surya 16)" />
+        <select id="new-cig-cat" class="input-field">
+          <option value="Filter / SKM">Filter / SKM</option>
+          <option value="Kretek / SKT">Kretek / SKT</option>
+          <option value="Mild / Putih">Mild / Putih</option>
+        </select>
+        <div class="form-row form-row-2" style="margin-bottom:0;">
+          <input type="number" id="new-cig-cost" class="input-field" placeholder="Harga Modal / Bks" />
+          <input type="number" id="new-cig-price" class="input-field" placeholder="Harga Jual / Bks" />
+        </div>
+        <div class="form-row form-row-2" style="margin-bottom:0;">
+          <input type="number" id="new-cig-stick" class="input-field" placeholder="Harga Ecer / Batang (opsional)" />
+          <input type="number" id="new-cig-stock" class="input-field" placeholder="Stok Awal (Bungkus)" value="10" />
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeAddCigModal()">Batal</button>
+        <button class="btn btn-primary" style="flex:1;margin-top:0;" onclick="saveNewCig()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 3 AKUN SESUAI PEMBAGIAN HAK AKSES
+    const ACCOUNTS = {
+      owner: { psw: "1234", role: "owner", label: "ID 1 • OWNER LENGKAP" },
+      admin: { psw: "1234", role: "admin", label: "ID 2 • KASIR PS & WARUNG" },
+      rokok: { psw: "1234", role: "rokok", label: "ID 3 • KHUSUS ROKOK" }
+    };
+
+    const STORAGE_KEY = "kartama_point_pos_v3";
+
+    let state = {
+      user: null,
+      theme: "light",
+      ratePerHour: 7000,
+      psUnits: [
+        { id: 1, name: "PS4 Unit 1", status: "idle", mode: "open", targetMinutes: 60, elapsedSeconds: 0, lastTick: null, snackBill: 0, snackNotes: [] },
+        { id: 2, name: "PS4 Unit 2", status: "idle", mode: "open", targetMinutes: 60, elapsedSeconds: 0, lastTick: null, snackBill: 0, snackNotes: [] }
+      ],
+      // Warung Jajan (Tanpa Rokok)
+      snacks: [
+        { id: 1, name: "Es Teh Manis", cat: "Minuman", price: 5000, stock: 30 },
+        { id: 2, name: "Kopi Hitam / Susu", cat: "Minuman", price: 5000, stock: 25 },
+        { id: 3, name: "Air Mineral 600ml", cat: "Minuman", price: 4000, stock: 24 },
+        { id: 4, name: "Teh Botol / Pucuk", cat: "Minuman", price: 5000, stock: 20 },
+        { id: 5, name: "Indomie Goreng / Rebus", cat: "Makanan", price: 8000, stock: 20 },
+        { id: 6, name: "Indomie + Telur", cat: "Makanan", price: 11000, stock: 15 },
+        { id: 7, name: "Chitato / Lays", cat: "Camilan", price: 5000, stock: 18 },
+        { id: 8, name: "Gorengan / Camilan", cat: "Camilan", price: 2000, stock: 30 }
+      ],
+      // Database Khusus Rokok (ID 3 & ID 1)
+      cigarettes: [
+        { id: 101, name: "Gudang Garam Surya 16", cat: "Filter / SKM", cost: 32500, price: 35000, stickPrice: 2500, stock: 15 },
+        { id: 102, name: "Sampoerna A Mild 16", cat: "Mild / Putih", cost: 33000, price: 36000, stickPrice: 2500, stock: 12 },
+        { id: 103, name: "Djarum Super 12", cat: "Filter / SKM", cost: 24000, price: 26000, stickPrice: 2500, stock: 10 },
+        { id: 104, name: "LA Bold 20", cat: "Filter / SKM", cost: 33500, price: 36000, stickPrice: 2000, stock: 8 },
+        { id: 105, name: "Dji Sam Soe 234 (12)", cat: "Kretek / SKT", cost: 20500, price: 23000, stickPrice: 2000, stock: 14 },
+        { id: 106, name: "Evo / Esse Change", cat: "Mild / Putih", cost: 35000, price: 38000, stickPrice: 2500, stock: 4 }
+      ],
+      cart: [],
+      cigCart: [],
+      selectedCat: "Semua",
+      selectedCigCat: "Semua",
+      reportFilter: "Semua",
+      transactions: [],
+      cigKasbons: []
+    };
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          state = { ...state, ...parsed };
+        } catch (e) {}
+      }
+      document.documentElement.setAttribute("data-theme", state.theme || "light");
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function formatRp(num) {
+      return "Rp " + Math.round(num || 0).toLocaleString("id-ID");
+    }
+
+    function formatTime(sec) {
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+    }
+
+    // LOGIN
+    document.getElementById("login-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const id = document.getElementById("login-id").value.trim().toLowerCase();
+      const psw = document.getElementById("login-psw").value.trim();
+      const err = document.getElementById("login-error");
+
+      if (ACCOUNTS[id] && ACCOUNTS[id].psw === psw) {
+        state.user = { id, role: ACCOUNTS[id].role, label: ACCOUNTS[id].label };
+        saveState();
+        err.textContent = "";
+        document.getElementById("login-id").value = "";
+        document.getElementById("login-psw").value = "";
+        initApp();
+      } else {
+        err.textContent = "ID Pengguna atau Kata Sandi salah.";
+      }
+    });
+
+    function logout() {
+      state.user = null;
+      saveState();
+      document.getElementById("app-view").style.display = "none";
+      document.getElementById("login-view").style.display = "flex";
+    }
+
+    // KONFIGURASI MENU BERDASARKAN ROLE (ID 1, ID 2, ID 3)
+    const ROLE_MENUS = {
+      owner: [
+        { id: "ps4", icon: "🎮", label: "PS4" },
+        { id: "warung", icon: "🍿", label: "Warung" },
+        { id: "digital", icon: "💳", label: "Digital" },
+        { id: "rokok-pos", icon: "🚬", label: "Rokok" },
+        { id: "rokok-stok", icon: "📦", label: "Stok Rokok" },
+        { id: "laporan", icon: "📊", label: "Laporan" },
+        { id: "pengaturan", icon: "⚙️", label: "Owner" }
+      ],
+      admin: [
+        { id: "ps4", icon: "🎮", label: "PS4" },
+        { id: "warung", icon: "🍿", label: "Warung" },
+        { id: "digital", icon: "💳", label: "Digital" },
+        { id: "laporan", icon: "📊", label: "Laporan" }
+      ],
+      rokok: [
+        { id: "rokok-pos", icon: "🚬", label: "Kasir Rokok" },
+        { id: "rokok-stok", icon: "📦", label: "Stok & HPP" },
+        { id: "rokok-kasbon", icon: "📒", label: "Kasbon & Rekap" }
+      ]
+    };
+
+    function initApp() {
+      if (!state.user) return;
+      document.getElementById("login-view").style.display = "none";
+      document.getElementById("app-view").style.display = "block";
+
+      const role = state.user.role;
+      document.getElementById("role-badge").textContent = state.user.label;
+      document.getElementById("sidebar-role").textContent = state.user.label;
+
+      const menus = ROLE_MENUS[role] || [];
+
+      // Render Sidebar Nav (iPad)
+      document.getElementById("sidebar-nav").innerHTML = menus.map((m, i) => `
+        <button class="nav-item ${i === 0 ? "active" : ""}" data-tab="${m.id}" onclick="switchTab('${m.id}')">${m.icon} ${m.label}</button>
+      `).join("");
+
+      // Render Bottom Tab Bar (iPhone - max 5 utama agar rapi)
+      const mobileMenus = role === "owner"
+        ? [
+            { id: "ps4", icon: "🎮", label: "PS4" },
+            { id: "warung", icon: "🍿", label: "Warung" },
+            { id: "rokok-pos", icon: "🚬", label: "Rokok" },
+            { id: "laporan", icon: "📊", label: "Laporan" },
+            { id: "pengaturan", icon: "⚙️", label: "Owner" }
+          ]
+        : menus;
+
+      document.getElementById("bottom-bar").innerHTML = mobileMenus.map((m, i) => `
+        <button class="tab-btn ${i === 0 ? "active" : ""}" data-tab="${m.id}" onclick="switchTab('${m.id}')">
+          <span class="tab-icon">${m.icon}</span>
+          <span>${m.label}</span>
+        </button>
+      `).join("");
+
+      // Pengaturan eksklusif ID 1 (Owner)
+      const isOwner = role === "owner";
+      document.getElementById("set-rate").value = state.ratePerHour;
+      document.getElementById("btn-add-snack").style.display = isOwner ? "inline-flex" : "none";
+      document.getElementById("btn-clear-history").style.display = isOwner ? "inline-flex" : "none";
+      document.getElementById("owner-report-filters").style.display = isOwner ? "flex" : "none";
+
+      switchTab(menus[0].id);
+      renderAll();
+    }
+
+    function switchTab(tab) {
+      const titles = {
+        ps4: "Rental PS4",
+        warung: "Warung Jajan (Non-Rokok)",
+        digital: "Transaksi Digital & BRI",
+        "rokok-pos": "Kasir Penjualan Rokok",
+        "rokok-stok": "Stok & Restock Rokok",
+        "rokok-kasbon": "Kasbon & Rekap Rokok",
+        laporan: state.user?.role === "owner" ? "Laporan Gabungan Owner" : "Laporan Shift (PS4, Warung, Digital)",
+        pengaturan: "Pengaturan Eksklusif Owner"
+      };
+      document.getElementById("page-title").textContent = titles[tab] || "Kartama Point";
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      const targetSec = document.getElementById("sec-" + tab);
+      if (targetSec) targetSec.classList.add("active");
+
+      document.querySelectorAll("[data-tab]").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
+      });
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", state.theme);
+      saveState();
+    }
+
+    // SUMMARY STRIP BERDASARKAN ROLE
+    function updateStats() {
+      const today = new Date().toISOString().slice(0, 10);
+      const todayTx = state.transactions.filter(t => t.date === today);
+      const role = state.user?.role;
+      const strip = document.getElementById("stats-strip");
+
+      if (role === "rokok") {
+        // ID 3: Hanya statistik rokok
+        const cigTx = todayTx.filter(t => t.category === "Rokok");
+        const omzet = cigTx.reduce((s, t) => s + t.amount, 0);
+        const laba = cigTx.reduce((s, t) => s + (t.profit || 0), 0);
+        const totalKasbon = state.cigKasbons.filter(k => !k.paid).reduce((s, k) => s + k.amount, 0);
+        const lowStock = state.cigarettes.filter(c => c.stock <= 5).length;
+
+        strip.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-label">Omzet Rokok Hari Ini</div>
+            <div class="stat-value">${formatRp(omzet)}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Laba Bersih Rokok</div>
+            <div class="stat-value" style="color:var(--green);">${formatRp(laba)}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Kasbon Aktif / Stok Menipis</div>
+            <div class="stat-value">${formatRp(totalKasbon)} <span style="font-size:13px;color:var(--orange);">(${lowStock} merk)</span></div>
+          </div>
+        `;
+      } else if (role === "admin") {
+        // ID 2: Hanya PS4, Warung, Digital (Tanpa Rokok)
+        const nonCigTx = todayTx.filter(t => t.category !== "Rokok");
+        const kasNonRokok = nonCigTx.reduce((s, t) => s + (t.profit || 0), 0);
+        const digitalProfit = nonCigTx.filter(t => t.category === "Digital").reduce((s, t) => s + (t.profit || 0), 0);
+        const activePs = state.psUnits.filter(u => u.status === "playing").length;
+
+        strip.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-label">Kas PS4, Warung & Digital</div>
+            <div class="stat-value">${formatRp(kasNonRokok)}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Unit PS4 Aktif</div>
+            <div class="stat-value">${activePs} / ${state.psUnits.length}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Laba Admin Digital</div>
+            <div class="stat-value" style="color:var(--green);">${formatRp(digitalProfit)}</div>
+          </div>
+        `;
+      } else {
+        // ID 1 (Owner): Gabungan Semua Lini + Laba Bersih Total
+        const totalKas = todayTx.reduce((s, t) => s + (t.profit || 0), 0);
+        const omzetRokok = todayTx.filter(t => t.category === "Rokok").reduce((s, t) => s + t.amount, 0);
+        const activePs = state.psUnits.filter(u => u.status === "playing").length;
+
+        strip.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-label">Total Laba Bersih Semua Lini</div>
+            <div class="stat-value" style="color:var(--green);">${formatRp(totalKas)}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Omzet Rokok Hari Ini</div>
+            <div class="stat-value">${formatRp(omzetRokok)}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Unit PS4 Aktif</div>
+            <div class="stat-value">${activePs} / ${state.psUnits.length}</div>
+          </div>
+        `;
+      }
+    }
+
+    // ==================== 1. RENTAL PS4 ====================
+    function calcPsCost(unit) {
+      if (unit.mode === "paket") {
+        return Math.ceil((unit.targetMinutes / 60) * state.ratePerHour / 500) * 500;
+      }
+      if (unit.elapsedSeconds === 0) return 0;
+      const raw = (unit.elapsedSeconds / 3600) * state.ratePerHour;
+      return Math.max(1000, Math.ceil(raw / 500) * 500);
+    }
+
+    function startPs(id) {
+      const u = state.psUnits.find(x => x.id === id);
+      if (!u) return;
+      if (u.status === "idle") {
+        const modeSel = document.getElementById("mode-ps-" + id);
+        if (modeSel) {
+          const val = modeSel.value;
+          if (val === "open") u.mode = "open";
+          else { u.mode = "paket"; u.targetMinutes = parseInt(val, 10); }
+        }
+      }
+      u.status = "playing";
+      u.lastTick = Date.now();
+      saveState();
+      renderPs4();
+      updateStats();
+    }
+
+    function pausePs(id) {
+      const u = state.psUnits.find(x => x.id === id);
+      if (!u || u.status !== "playing") return;
+      u.status = "paused";
+      u.lastTick = null;
+      saveState();
+      renderPs4();
+      updateStats();
+    }
+
+    function finishPs(id) {
+      const u = state.psUnits.find(x => x.id === id);
+      if (!u) return;
+      const rentalCost = calcPsCost(u);
+      const total = rentalCost + u.snackBill;
+
+      if (total > 0) {
+        state.transactions.unshift({
+          id: Date.now(),
+          time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+          date: new Date().toISOString().slice(0, 10),
+          category: "Rental PS4",
+          detail: `${u.name} (${formatTime(u.elapsedSeconds)})${u.snackBill > 0 ? " + Jajan " + formatRp(u.snackBill) : ""}`,
+          amount: total,
+          profit: total
+        });
+      }
+
+      u.status = "idle";
+      u.elapsedSeconds = 0;
+      u.lastTick = null;
+      u.snackBill = 0;
+      u.snackNotes = [];
+      saveState();
+      renderAll();
+    }
+
+    function renderPs4() {
+      const container = document.getElementById("ps4-container");
+      container.innerHTML = state.psUnits.map(u => {
+        const rentalCost = calcPsCost(u);
+        const total = rentalCost + u.snackBill;
+        const statusLabel = u.status === "playing" ? "Sedang Main" : u.status === "paused" ? "Dijeda" : "Kosong";
+        const statusClass = u.status === "playing" ? "status-playing" : u.status === "paused" ? "status-paused" : "status-idle";
+        const remaining = u.mode === "paket" ? Math.max(0, u.targetMinutes * 60 - u.elapsedSeconds) : null;
+
+        return `
+          <div class="card">
+            <div class="ps-header">
+              <strong style="font-size:18px;">${u.name}</strong>
+              <span class="status-pill ${statusClass}">${statusLabel}</span>
+            </div>
+            <div class="timer-display">${formatTime(u.elapsedSeconds)}</div>
+            ${u.mode === "paket" && u.status !== "idle" ? `<div style="font-size:12px;color:var(--orange);font-weight:600;">Sisa Paket: ${formatTime(remaining)}</div>` : ""}
+            ${u.status === "idle" ? `
+              <div style="margin:12px 0;">
+                <label class="field-label">Pilih Paket Main</label>
+                <select id="mode-ps-${u.id}" class="input-field" style="padding:10px 12px;">
+                  <option value="open">Open Billing (${formatRp(state.ratePerHour)}/jam)</option>
+                  <option value="60">Paket 1 Jam (${formatRp(state.ratePerHour)})</option>
+                  <option value="120">Paket 2 Jam (${formatRp(state.ratePerHour * 2)})</option>
+                  <option value="180">Paket 3 Jam (${formatRp(state.ratePerHour * 3)})</option>
+                </select>
+              </div>
+            ` : ""}
+            <div class="billing-box">
+              <div class="billing-row"><span>Biaya Sewa PS4</span><span>${formatRp(rentalCost)}</span></div>
+              <div class="billing-row"><span>Tambahan Jajan ${u.snackNotes.length ? `(${u.snackNotes.join(", ")})` : ""}</span><span>${formatRp(u.snackBill)}</span></div>
+              <div class="billing-row"><span>Total Tagihan</span><span style="color:var(--accent);">${formatRp(total)}</span></div>
+            </div>
+            <div class="control-row">
+              ${u.status !== "playing" ? `<button class="btn btn-green btn-sm" style="flex:1;" onclick="startPs(${u.id})">▶ Mulai</button>` : ""}
+              ${u.status === "playing" ? `<button class="btn btn-orange btn-sm" style="flex:1;" onclick="pausePs(${u.id})">⏸ Jeda</button>` : ""}
+              ${u.status !== "idle" ? `<button class="btn btn-red btn-sm" style="flex:1;" onclick="finishPs(${u.id})">✓ Selesai & Bayar</button>` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ==================== 2. WARUNG JAJAN (NON-ROKOK) ====================
+    function setSnackCat(cat, el) {
+      state.selectedCat = cat;
+      document.querySelectorAll("#snack-categories .chip").forEach(c => c.classList.remove("active"));
+      el.classList.add("active");
+      renderSnacks();
+    }
+
+    function renderSnacks() {
+      const q = (document.getElementById("snack-search").value || "").toLowerCase();
+      const grid = document.getElementById("snack-grid");
+      const filtered = state.snacks.filter(s => {
+        const matchCat = state.selectedCat === "Semua" || s.cat === state.selectedCat;
+        const matchQ = s.name.toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+      grid.innerHTML = filtered.map(s => `
+        <div class="snack-item clickable" onclick="addToCart(${s.id})">
+          <div>
+            <div class="snack-name">${s.name}</div>
+            <div class="snack-price">${formatRp(s.price)}</div>
+          </div>
+          <div class="snack-stock">Stok: ${s.stock}</div>
+        </div>
+      `).join("");
+    }
+
+    function addToCart(snackId) {
+      const snack = state.snacks.find(s => s.id === snackId);
+      if (!snack || snack.stock <= 0) return;
+      const existing = state.cart.find(c => c.id === snackId);
+      if (existing) { if (existing.qty < snack.stock) existing.qty++; }
+      else state.cart.push({ id: snack.id, name: snack.name, price: snack.price, qty: 1 });
+      renderCart();
+    }
+
+    function updateCartQty(snackId, delta) {
+      const idx = state.cart.findIndex(c => c.id === snackId);
+      if (idx === -1) return;
+      const snack = state.snacks.find(s => s.id === snackId);
+      state.cart[idx].qty += delta;
+      if (state.cart[idx].qty <= 0) state.cart.splice(idx, 1);
+      else if (snack && state.cart[idx].qty > snack.stock) state.cart[idx].qty = snack.stock;
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById("cart-list");
+      const totalEl = document.getElementById("cart-total");
+      if (!state.cart.length) {
+        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;text-align:center;padding:30px 0;">Belum ada item dipilih</div>`;
+        totalEl.textContent = "Rp 0";
+        return;
+      }
+      let total = 0;
+      list.innerHTML = state.cart.map(c => {
+        const sub = c.price * c.qty;
+        total += sub;
+        return `
+          <div class="cart-item">
+            <div>
+              <div style="font-weight:600;font-size:14px;">${c.name}</div>
+              <div style="font-size:12px;color:var(--text-secondary);">${formatRp(c.price)} × ${c.qty}</div>
+            </div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="updateCartQty(${c.id}, -1)">-</button>
+              <span style="font-weight:700;min-width:18px;text-align:center;">${c.qty}</span>
+              <button class="qty-btn" onclick="updateCartQty(${c.id}, 1)">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+      totalEl.textContent = formatRp(total);
+    }
+
+    function checkoutCart(target) {
+      if (!state.cart.length) return;
+      const total = state.cart.reduce((sum, c) => sum + c.price * c.qty, 0);
+      const summary = state.cart.map(c => `${c.name} (${c.qty})`).join(", ");
+
+      state.cart.forEach(c => {
+        const s = state.snacks.find(x => x.id === c.id);
+        if (s) s.stock = Math.max(0, s.stock - c.qty);
+      });
+
+      if (target === "ps1" || target === "ps2") {
+        const unitId = target === "ps1" ? 1 : 2;
+        const unit = state.psUnits.find(u => u.id === unitId);
+        if (unit && unit.status !== "idle") {
+          unit.snackBill += total;
+          unit.snackNotes.push(summary);
+          state.cart = [];
+          saveState();
+          renderAll();
+          alert(`Tagihan jajan (${formatRp(total)}) digabungkan ke ${unit.name}.`);
+          return;
+        }
+      }
+
+      state.transactions.unshift({
+        id: Date.now(),
+        time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+        date: new Date().toISOString().slice(0, 10),
+        category: "Warung Jajan",
+        detail: summary,
+        amount: total,
+        profit: total
+      });
+
+      state.cart = [];
+      saveState();
+      renderAll();
+    }
+
+    function openAddSnackModal() { document.getElementById("snack-modal").style.display = "flex"; }
+    function closeAddSnackModal() { document.getElementById("snack-modal").style.display = "none"; }
+    function saveNewSnack() {
+      const name = document.getElementById("new-snack-name").value.trim();
+      const cat = document.getElementById("new-snack-cat").value;
+      const price = parseInt(document.getElementById("new-snack-price").value, 10);
+      const stock = parseInt(document.getElementById("new-snack-stock").value, 10) || 0;
+      if (!name || !price) return;
+      state.snacks.push({ id: Date.now(), name, cat, price, stock });
+      document.getElementById("new-snack-name").value = "";
+      document.getElementById("new-snack-price").value = "";
+      closeAddSnackModal();
+      saveState();
+      renderSnacks();
+    }
+
+    // ==================== 3. TRANSAKSI DIGITAL ====================
+    function addDigitalTx() {
+      const type = document.getElementById("dig-type").value;
+      const note = document.getElementById("dig-note").value.trim();
+      const amount = parseInt(document.getElementById("dig-amount").value, 10) || 0;
+      const fee = parseInt(document.getElementById("dig-fee").value, 10) || 0;
+      if (amount <= 0 && fee <= 0) return;
+
+      state.transactions.unshift({
+        id: Date.now(),
+        time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+        date: new Date().toISOString().slice(0, 10),
+        category: "Digital",
+        detail: `${type}${note ? " - " + note : ""} (Pokok ${formatRp(amount)})`,
+        amount: amount + fee,
+        profit: fee
+      });
+
+      document.getElementById("dig-note").value = "";
+      document.getElementById("dig-amount").value = "";
+      document.getElementById("dig-fee").value = "";
+      saveState();
+      renderAll();
+    }
+
+    function renderDigitalHistory() {
+      const list = document.getElementById("digital-history");
+      const today = new Date().toISOString().slice(0, 10);
+      const items = state.transactions.filter(t => t.category === "Digital" && t.date === today);
+      if (!items.length) {
+        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Belum ada transaksi digital hari ini.</div>`;
+        return;
+      }
+      list.innerHTML = items.map(t => `
+        <div class="history-item">
+          <div>
+            <div style="font-weight:600;font-size:14px;">${t.detail}</div>
+            <div style="font-size:12px;color:var(--text-secondary);">${t.time} • Laba Admin: <strong style="color:var(--green);">${formatRp(t.profit)}</strong></div>
+          </div>
+          <div style="font-weight:700;">${formatRp(t.amount)}</div>
+        </div>
+      `).join("");
+    }
+
+    // ==================== 4. KHUSUS PENJUALAN ROKOK (ID 3 & ID 1) ====================
+    function setCigCat(cat, el) {
+      state.selectedCigCat = cat;
+      document.querySelectorAll("#cig-categories .chip").forEach(c => c.classList.remove("active"));
+      el.classList.add("active");
+      renderCigarettes();
+    }
+
+    function renderCigarettes() {
+      const q = (document.getElementById("cig-search").value || "").toLowerCase();
+      const grid = document.getElementById("cig-grid");
+      const filtered = state.cigarettes.filter(c => {
+        const matchCat = state.selectedCigCat === "Semua" || c.cat === state.selectedCigCat;
+        const matchQ = c.name.toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+
+      grid.innerHTML = filtered.map(c => {
+        const lowBadge = c.stock <= 5 ? `<span class="badge badge-red">Sisa ${c.stock}</span>` : `<span style="font-size:11px;color:var(--text-secondary);">Stok: ${c.stock} bks</span>`;
+        return `
+          <div class="snack-item">
+            <div>
+              <div class="snack-name">${c.name}</div>
+              <div class="snack-price">${formatRp(c.price)} / bks</div>
+              <div style="margin-top:4px;">${lowBadge}</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px;">
+              <button class="btn btn-primary btn-sm" style="flex:1;margin-top:0;" onclick="addCigToCart(${c.id}, 'bks')">+ Bks</button>
+              ${c.stickPrice ? `<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="addCigToCart(${c.id}, 'btg')">+ Btg (${formatRp(c.stickPrice)})</button>` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function addCigToCart(cigId, unitType) {
+      const cig = state.cigarettes.find(c => c.id === cigId);
+      if (!cig || cig.stock <= 0) { alert("Stok bungkus habis!"); return; }
+      const key = `${cigId}_${unitType}`;
+      const price = unitType === "bks" ? cig.price : cig.stickPrice;
+      const cost = unitType === "bks" ? cig.cost : Math.round(cig.cost / 16);
+      const label = unitType === "bks" ? `${cig.name} (1 Bks)` : `${cig.name} (Ecer Batang)`;
+
+      const existing = state.cigCart.find(x => x.key === key);
+      if (existing) existing.qty++;
+      else state.cigCart.push({ key, cigId, unitType, label, price, cost, qty: 1 });
+      renderCigCart();
+    }
+
+    function updateCigCartQty(key, delta) {
+      const idx = state.cigCart.findIndex(x => x.key === key);
+      if (idx === -1) return;
+      state.cigCart[idx].qty += delta;
+      if (state.cigCart[idx].qty <= 0) state.cigCart.splice(idx, 1);
+      renderCigCart();
+    }
+
+    function renderCigCart() {
+      const list = document.getElementById("cig-cart-list");
+      const totalEl = document.getElementById("cig-cart-total");
+      const profitEl = document.getElementById("cig-cart-profit");
+
+      if (!state.cigCart.length) {
+        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;text-align:center;padding:30px 0;">Pilih rokok (bungkus / ecer batang)</div>`;
+        totalEl.textContent = "Rp 0";
+        profitEl.textContent = "Rp 0";
+        return;
+      }
+
+      let total = 0;
+      let profit = 0;
+      list.innerHTML = state.cigCart.map(c => {
+        const sub = c.price * c.qty;
+        const subProfit = (c.price - c.cost) * c.qty;
+        total += sub;
+        profit += subProfit;
+        return `
+          <div class="cart-item">
+            <div>
+              <div style="font-weight:600;font-size:14px;">${c.label}</div>
+              <div style="font-size:12px;color:var(--text-secondary);">${formatRp(c.price)} × ${c.qty} (Laba ${formatRp(subProfit)})</div>
+            </div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="updateCigCartQty('${c.key}', -1)">-</button>
+              <span style="font-weight:700;min-width:18px;text-align:center;">${c.qty}</span>
+              <button class="qty-btn" onclick="updateCigCartQty('${c.key}', 1)">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+      totalEl.textContent = formatRp(total);
+      profitEl.textContent = formatRp(profit);
+    }
+
+    function checkoutCigCart(method) {
+      if (!state.cigCart.length) return;
+      const total = state.cigCart.reduce((s, c) => s + c.price * c.qty, 0);
+      const profit = state.cigCart.reduce((s, c) => s + (c.price - c.cost) * c.qty, 0);
+      const summary = state.cigCart.map(c => `${c.label} ×${c.qty}`).join(", ");
+
+      let customerName = "";
+      if (method === "Kasbon") {
+        customerName = prompt("Masukkan nama pembeli kasbon rokok:");
+        if (!customerName) return;
+      }
+
+      // Kurangi stok bungkus
+      state.cigCart.forEach(item => {
+        const cig = state.cigarettes.find(c => c.id === item.cigId);
+        if (cig && item.unitType === "bks") {
+          cig.stock = Math.max(0, cig.stock - item.qty);
+        }
+      });
+
+      if (method === "Kasbon") {
+        state.cigKasbons.unshift({
+          id: Date.now(),
+          name: customerName.trim(),
+          detail: summary,
+          amount: total,
+          profit: profit,
+          date: new Date().toISOString().slice(0, 10),
+          paid: false
+        });
+      } else {
+        state.transactions.unshift({
+          id: Date.now(),
+          time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+          date: new Date().toISOString().slice(0, 10),
+          category: "Rokok",
+          detail: `[${method}] ${summary}`,
+          amount: total,
+          profit: profit
+        });
+      }
+
+      state.cigCart = [];
+      saveState();
+      renderAll();
+    }
+
+    function renderCigStockList() {
+      const container = document.getElementById("cig-stock-list");
+      container.innerHTML = state.cigarettes.map(c => {
+        const margin = c.price - c.cost;
+        return `
+          <div class="history-item">
+            <div>
+              <div style="font-weight:700;font-size:15px;">${c.name} <span class="badge">${c.cat}</span></div>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">
+                Modal: ${formatRp(c.cost)} • Jual: ${formatRp(c.price)} • Laba/Bks: <strong style="color:var(--green);">${formatRp(margin)}</strong>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="badge ${c.stock <= 5 ? "badge-red" : "badge-green"}">${c.stock} Bks</span>
+              <button class="btn btn-ghost btn-sm" onclick="restockCig(${c.id}, 1)">+1 Bks</button>
+              <button class="btn btn-primary btn-sm" style="margin-top:0;" onclick="restockCig(${c.id}, 10)">+1 Slop (10)</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function restockCig(id, qty) {
+      const cig = state.cigarettes.find(c => c.id === id);
+      if (!cig) return;
+      cig.stock += qty;
+      saveState();
+      renderAll();
+    }
+
+    function renderCigKasbonAndHistory() {
+      const kbList = document.getElementById("cig-kasbon-list");
+      const activeKb = state.cigKasbons.filter(k => !k.paid);
+      if (!activeKb.length) {
+        kbList.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Tidak ada kasbon rokok yang belum lunas.</div>`;
+      } else {
+        kbList.innerHTML = activeKb.map(k => `
+          <div class="history-item">
+            <div>
+              <div style="font-weight:700;font-size:14px;">${k.name} <span class="badge badge-orange">Belum Lunas</span></div>
+              <div style="font-size:12px;color:var(--text-secondary);">${k.detail} (${k.date})</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;margin-bottom:4px;">${formatRp(k.amount)}</div>
+              <button class="btn btn-green btn-sm" onclick="payCigKasbon(${k.id})">Lunasi</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      const histList = document.getElementById("cig-history-list");
+      const cigTx = state.transactions.filter(t => t.category === "Rokok");
+      if (!cigTx.length) {
+        histList.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Belum ada transaksi rokok.</div>`;
+      } else {
+        histList.innerHTML = cigTx.map(t => `
+          <div class="history-item">
+            <div>
+              <div style="font-weight:600;font-size:14px;">${t.detail}</div>
+              <div style="font-size:12px;color:var(--text-secondary);">${t.date} • ${t.time} • Laba: <strong style="color:var(--green);">${formatRp(t.profit)}</strong></div>
+            </div>
+            <div style="font-weight:700;">${formatRp(t.amount)}</div>
+          </div>
+        `).join("");
+      }
+    }
+
+    function payCigKasbon(id) {
+      const kb = state.cigKasbons.find(k => k.id === id);
+      if (!kb) return;
+      kb.paid = true;
+      state.transactions.unshift({
+        id: Date.now(),
+        time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+        date: new Date().toISOString().slice(0, 10),
+        category: "Rokok",
+        detail: `[Pelunasan Kasbon: ${kb.name}] ${kb.detail}`,
+        amount: kb.amount,
+        profit: kb.profit
+      });
+      saveState();
+      renderAll();
+    }
+
+    function openAddCigModal() { document.getElementById("cig-modal").style.display = "flex"; }
+    function closeAddCigModal() { document.getElementById("cig-modal").style.display = "none"; }
+    function saveNewCig() {
+      const name = document.getElementById("new-cig-name").value.trim();
+      const cat = document.getElementById("new-cig-cat").value;
+      const cost = parseInt(document.getElementById("new-cig-cost").value, 10) || 0;
+      const price = parseInt(document.getElementById("new-cig-price").value, 10) || 0;
+      const stickPrice = parseInt(document.getElementById("new-cig-stick").value, 10) || 0;
+      const stock = parseInt(document.getElementById("new-cig-stock").value, 10) || 0;
+      if (!name || !price) return;
+      state.cigarettes.push({ id: Date.now(), name, cat, cost, price, stickPrice, stock });
+      document.getElementById("new-cig-name").value = "";
+      document.getElementById("new-cig-cost").value = "";
+      document.getElementById("new-cig-price").value = "";
+      document.getElementById("new-cig-stick").value = "";
+      closeAddCigModal();
+      saveState();
+      renderAll();
+    }
+
+    // ==================== 5. LAPORAN & PENGATURAN OWNER ====================
+    function setReportFilter(cat, el) {
+      state.reportFilter = cat;
+      document.querySelectorAll("#owner-report-filters .chip").forEach(c => c.classList.remove("active"));
+      el.classList.add("active");
+      renderAllHistory();
+    }
+
+    function renderAllHistory() {
+      const list = document.getElementById("all-history");
+      const role = state.user?.role;
+      let items = state.transactions;
+
+      if (role === "admin") {
+        // ID 2 tidak boleh melihat laporan rokok
+        items = items.filter(t => t.category !== "Rokok");
+        document.getElementById("laporan-subtitle").textContent = "Menampilkan transaksi Rental PS4, Warung Jajan, dan Transaksi Digital";
+      } else if (role === "owner") {
+        document.getElementById("laporan-subtitle").textContent = "Akses Penuh Owner — Gabungan semua lini usaha";
+        if (state.reportFilter !== "Semua") {
+          items = items.filter(t => t.category === state.reportFilter);
+        }
+      }
+
+      if (!items.length) {
+        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Belum ada riwayat transaksi.</div>`;
+        return;
+      }
+
+      list.innerHTML = items.map(t => `
+        <div class="history-item">
+          <div>
+            <span class="badge" style="margin-right:6px;">${t.category}</span>
+            <span style="font-weight:600;font-size:14px;">${t.detail}</span>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">${t.date} • ${t.time}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700;">${formatRp(t.amount)}</div>
+            <div style="font-size:11px;color:var(--green);">Laba/Masuk Kas: ${formatRp(t.profit)}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function saveSettings() {
+      if (state.user?.role !== "owner") return;
+      const val = parseInt(document.getElementById("set-rate").value, 10);
+      if (val && val > 0) {
+        state.ratePerHour = val;
+        saveState();
+        renderPs4();
+        alert("Tarif PS4 berhasil diperbarui.");
+      }
+    }
+
+    function clearHistory() {
+      if (state.user?.role !== "owner") return;
+      if (confirm("Hapus seluruh riwayat transaksi semua lini?")) {
+        state.transactions = [];
+        state.cigKasbons = [];
+        saveState();
+        renderAll();
+      }
+    }
+
+    function exportCigCSV() {
+      const rows = [["Tanggal", "Jam", "Detail Penjualan Rokok", "Omzet", "Laba Bersih"]];
+      state.transactions.filter(t => t.category === "Rokok").forEach(t => {
+        rows.push([t.date, t.time, `"${t.detail.replace(/"/g, '""')}"`, t.amount, t.profit]);
+      });
+      downloadCSV(rows, `laporan-rokok-kartama-${new Date().toISOString().slice(0, 10)}.csv`);
+    }
+
+    function exportAllCSV() {
+      const role = state.user?.role;
+      const rows = [["Tanggal", "Jam", "Kategori", "Detail", "Total", "Laba/Masuk Kas"]];
+      const source = role === "admin" ? state.transactions.filter(t => t.category !== "Rokok") : state.transactions;
+      source.forEach(t => {
+        rows.push([t.date, t.time, t.category, `"${t.detail.replace(/"/g, '""')}"`, t.amount, t.profit]);
+      });
+      downloadCSV(rows, `laporan-kartama-point-${new Date().toISOString().slice(0, 10)}.csv`);
+    }
+
+    function downloadCSV(rows, filename) {
+      const csv = rows.map(r => r.join(",")).join("
+");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+    }
+
+    function renderAll() {
+      renderPs4();
+      renderSnacks();
+      renderCart();
+      renderDigitalHistory();
+      renderCigarettes();
+      renderCigCart();
+      renderCigStockList();
+      renderCigKasbonAndHistory();
+      renderAllHistory();
+      updateStats();
+    }
+
+    // LIVE TIMER TICKER PS4
+    setInterval(() => {
+      let changed = false;
+      const now = Date.now();
+      state.psUnits.forEach(u => {
+        if (u.status === "playing") {
+          const diff = u.lastTick ? Math.max(1, Math.floor((now - u.lastTick) / 1000)) : 1;
+          u.elapsedSeconds += diff;
+          u.lastTick = now;
+          changed = true;
+        }
+      });
+      if (changed) {
+        saveState();
+        if (state.user && (state.user.role === "owner" || state.user.role === "admin")) renderPs4();
+      }
+    }, 1000);
+
+    loadState();
+    if (state.user) initApp();
+  </script>
+</body>
+</html>
