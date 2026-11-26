@@ -181,15 +181,13 @@
     #loading-view {
       position: fixed;
       inset: 0;
-      z-index: 100;
+      z-index: 9999;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background: radial-gradient(circle at top right, var(--accent-soft), transparent 55%), var(--bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: var(--bg);
     }
 
     .loading-card {
@@ -867,76 +865,102 @@
       return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
     }
 
-    let loginLoadingTimer = null;
+    var loginLoadingTimer = null;
+    var loginFinishTimeout = null;
 
     function handleLogin() {
-      const idInput = document.getElementById("login-id");
-      const pswInput = document.getElementById("login-psw");
-      const err = document.getElementById("login-error");
+      var idInput = document.getElementById("login-id");
+      var pswInput = document.getElementById("login-psw");
+      var err = document.getElementById("login-error");
 
-      const id = (idInput.value || "").trim().toLowerCase();
-      const psw = (pswInput.value || "").trim();
+      var id = (idInput && idInput.value ? idInput.value : "").replace(/^\s+|\s+$/g, "").toLowerCase();
+      var psw = (pswInput && pswInput.value ? pswInput.value : "").replace(/^\s+|\s+$/g, "");
 
       if (!id || !psw) {
-        err.textContent = "Masukkan ID Pengguna dan Kata Sandi.";
+        if (err) err.textContent = "Masukkan ID Pengguna dan Kata Sandi.";
         return;
       }
 
       if (ACCOUNTS[id] && ACCOUNTS[id].psw === psw) {
-        const account = ACCOUNTS[id];
+        var account = ACCOUNTS[id];
         state.user = { id: id, role: account.role, label: account.label };
         saveState();
-        err.textContent = "";
-        idInput.value = "";
-        pswInput.value = "";
+        if (err) err.textContent = "";
+        if (idInput) idInput.value = "";
+        if (pswInput) pswInput.value = "";
 
         showLoginLoading(account, function() {
           initApp();
         });
       } else {
-        err.textContent = "ID atau Kata Sandi salah. (Gunakan: owner / admin / rokok — sandi: 1234)";
+        if (err) err.textContent = "ID atau Kata Sandi salah. (Gunakan: owner / admin / rokok — sandi: 1234)";
+      }
+    }
+
+    function finishLoginLoading(onComplete) {
+      if (loginLoadingTimer) {
+        clearInterval(loginLoadingTimer);
+        loginLoadingTimer = null;
+      }
+      if (loginFinishTimeout) {
+        clearTimeout(loginFinishTimeout);
+        loginFinishTimeout = null;
+      }
+      var loadingView = document.getElementById("loading-view");
+      if (loadingView) loadingView.style.display = "none";
+      if (typeof onComplete === "function") {
+        try {
+          onComplete();
+        } catch (e) {
+          var appView = document.getElementById("app-view");
+          if (appView) appView.style.display = "block";
+        }
       }
     }
 
     function showLoginLoading(account, onComplete) {
       if (loginLoadingTimer) clearInterval(loginLoadingTimer);
+      if (loginFinishTimeout) clearTimeout(loginFinishTimeout);
 
-      const loginView = document.getElementById("login-view");
-      const loadingView = document.getElementById("loading-view");
-      const loadingTitle = document.getElementById("loading-title");
-      const loadingSub = document.getElementById("loading-subtitle");
-      const loadingBar = document.getElementById("loading-bar");
-      const loadingStatus = document.getElementById("loading-status");
+      var loginView = document.getElementById("login-view");
+      var loadingView = document.getElementById("loading-view");
+      var loadingTitle = document.getElementById("loading-title");
+      var loadingSub = document.getElementById("loading-subtitle");
+      var loadingBar = document.getElementById("loading-bar");
+      var loadingStatus = document.getElementById("loading-status");
 
-      loginView.style.display = "none";
-      loadingView.style.display = "flex";
-      loadingTitle.textContent = "Selamat Datang, " + account.id.toUpperCase();
-      loadingSub.textContent = account.label;
-      loadingBar.style.width = "0%";
+      if (loginView) loginView.style.display = "none";
+      if (loadingView) loadingView.style.display = "flex";
+      if (loadingTitle) loadingTitle.textContent = "Selamat Datang, " + String(account.id || "").toUpperCase();
+      if (loadingSub) loadingSub.textContent = account.label || "Kartama Point";
+      if (loadingBar) loadingBar.style.width = "8%";
+      if (loadingStatus) loadingStatus.textContent = "Memverifikasi hak akses... (8%)";
 
       // Random duration between 1500ms (1.5s) and 5000ms (max 5.0s)
-      const durationMs = Math.floor(Math.random() * 3501) + 1500;
-      const startTime = Date.now();
-      const steps = [
+      var durationMs = Math.floor(Math.random() * 3501) + 1500;
+      var startTime = new Date().getTime();
+      var steps = [
         "Memverifikasi hak akses...",
         "Memuat modul operasional...",
         "Menyiapkan data transaksi & stok...",
         "Hampir selesai..."
       ];
 
-      loginLoadingTimer = setInterval(function() {
-        const elapsed = Date.now() - startTime;
-        const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
-        loadingBar.style.width = pct + "%";
+      loginFinishTimeout = setTimeout(function() {
+        finishLoginLoading(onComplete);
+      }, durationMs);
 
-        const stepIdx = Math.min(steps.length - 1, Math.floor((pct / 100) * steps.length));
-        loadingStatus.textContent = steps[stepIdx] + " (" + pct + "%)";
+      loginLoadingTimer = setInterval(function() {
+        var nowTime = new Date().getTime();
+        var elapsed = nowTime - startTime;
+        var pct = Math.min(100, Math.max(8, Math.round((elapsed / durationMs) * 100)));
+        if (loadingBar) loadingBar.style.width = pct + "%";
+
+        var stepIdx = Math.min(steps.length - 1, Math.floor((pct / 100) * steps.length));
+        if (loadingStatus) loadingStatus.textContent = steps[stepIdx] + " (" + pct + "%)";
 
         if (elapsed >= durationMs) {
-          clearInterval(loginLoadingTimer);
-          loginLoadingTimer = null;
-          loadingView.style.display = "none";
-          if (typeof onComplete === "function") onComplete();
+          finishLoginLoading(onComplete);
         }
       }, 60);
     }
