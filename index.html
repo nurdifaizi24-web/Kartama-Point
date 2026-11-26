@@ -173,6 +173,66 @@
       font-size: 13px;
       margin-top: 12px;
       min-height: 18px;
+      font-weight: 600;
+    }
+
+
+    /* LOADING SCREEN OVERLAY */
+    #loading-view {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: radial-gradient(circle at top right, var(--accent-soft), transparent 55%), var(--bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .loading-card {
+      width: 100%;
+      max-width: 340px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 36px 28px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .spinner-ring {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      border: 4px solid var(--accent-soft);
+      border-top-color: var(--accent);
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--border);
+    }
+
+    .loading-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #007aff, #5856d6);
+      border-radius: 999px;
+      transition: width 0.1s linear;
     }
 
     /* APP SHELL */
@@ -407,16 +467,30 @@
     <div class="login-card">
       <div class="brand-logo">KP</div>
       <h1 class="brand-title">Kartama Point</h1>
-      <form id="login-form" autocomplete="off">
+      <div id="login-form">
         <div class="input-group">
-          <input type="text" id="login-id" class="input-field" placeholder="ID Pengguna" required autocapitalize="none" />
+          <input type="text" id="login-id" class="input-field" placeholder="ID Pengguna" autocomplete="off" autocapitalize="none" onkeydown="if(event.key==='Enter') handleLogin()" />
         </div>
         <div class="input-group">
-          <input type="password" id="login-psw" class="input-field" placeholder="Kata Sandi" required />
+          <input type="password" id="login-psw" class="input-field" placeholder="Kata Sandi" autocomplete="off" onkeydown="if(event.key==='Enter') handleLogin()" />
         </div>
-        <button type="submit" class="btn btn-primary">Masuk</button>
+        <button type="button" class="btn btn-primary" onclick="handleLogin()">Masuk</button>
         <div id="login-error" class="error-msg"></div>
-      </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING SCREEN -->
+  <div id="loading-view">
+    <div class="loading-card">
+      <div class="brand-logo" style="width:64px;height:64px;font-size:24px;margin-bottom:16px;">KP</div>
+      <div class="spinner-ring"></div>
+      <div style="font-weight:700;font-size:18px;margin-bottom:6px;" id="loading-title">Memuat Sistem...</div>
+      <div style="font-size:13px;color:var(--text-secondary);" id="loading-subtitle">Menyiapkan ruang kerja Kartama Point</div>
+      <div class="loading-progress-track">
+        <div class="loading-progress-bar" id="loading-bar"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:10px;font-variant-numeric:tabular-nums;" id="loading-status">Sinkronisasi data...</div>
     </div>
   </div>
 
@@ -433,7 +507,7 @@
           </div>
         </div>
         <nav class="nav-list" id="sidebar-nav"></nav>
-        <button class="btn btn-ghost btn-sm" onclick="logout()" style="width:100%;">Keluar</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="logout()" style="width:100%;">Keluar</button>
       </aside>
 
       <!-- Main Area -->
@@ -444,8 +518,8 @@
           </div>
           <div class="topbar-actions">
             <span class="badge" id="role-badge">ROLE</span>
-            <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Ganti Tema">🌓</button>
-            <button class="btn btn-ghost btn-sm" onclick="logout()">Keluar</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Ganti Tema">🌓</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="logout()">Keluar</button>
           </div>
         </header>
 
@@ -464,13 +538,13 @@
               <div class="card">
                 <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
                   <input type="text" id="snack-search" class="input-field" placeholder="Cari jajanan / minuman..." oninput="renderSnacks()" style="flex:1;padding:10px 14px;" />
-                  <button id="btn-add-snack" class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddSnackModal()">+ Item Warung</button>
+                  <button type="button" id="btn-add-snack" class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddSnackModal()">+ Item Warung</button>
                 </div>
                 <div class="chip-group" id="snack-categories">
-                  <button class="chip active" onclick="setSnackCat('Semua', this)">Semua</button>
-                  <button class="chip" onclick="setSnackCat('Minuman', this)">Minuman</button>
-                  <button class="chip" onclick="setSnackCat('Makanan', this)">Makanan</button>
-                  <button class="chip" onclick="setSnackCat('Camilan', this)">Camilan</button>
+                  <button type="button" class="chip active" onclick="setSnackCat('Semua', this)">Semua</button>
+                  <button type="button" class="chip" onclick="setSnackCat('Minuman', this)">Minuman</button>
+                  <button type="button" class="chip" onclick="setSnackCat('Makanan', this)">Makanan</button>
+                  <button type="button" class="chip" onclick="setSnackCat('Camilan', this)">Camilan</button>
                 </div>
                 <div class="snack-grid" id="snack-grid"></div>
               </div>
@@ -484,10 +558,10 @@
                     <span id="cart-total">Rp 0</span>
                   </div>
                   <div class="form-row">
-                    <button class="btn btn-primary" style="margin-top:0;" onclick="checkoutCart('cash')">Bayar Tunai / QRIS</button>
+                    <button type="button" class="btn btn-primary" style="margin-top:0;" onclick="checkoutCart('cash')">Bayar Tunai / QRIS</button>
                     <div style="display:flex;gap:8px;">
-                      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="checkoutCart('ps1')">+ Tagihan PS4 #1</button>
-                      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="checkoutCart('ps2')">+ Tagihan PS4 #2</button>
+                      <button type="button" class="btn btn-ghost btn-sm" style="flex:1;" onclick="checkoutCart('ps1')">+ Tagihan PS4 #1</button>
+                      <button type="button" class="btn btn-ghost btn-sm" style="flex:1;" onclick="checkoutCart('ps2')">+ Tagihan PS4 #2</button>
                     </div>
                   </div>
                 </div>
@@ -526,7 +600,7 @@
                     <input type="number" id="dig-fee" class="input-field" placeholder="5000" />
                   </div>
                 </div>
-                <button class="btn btn-primary" onclick="addDigitalTx()">Simpan Transaksi</button>
+                <button type="button" class="btn btn-primary" onclick="addDigitalTx()">Simpan Transaksi</button>
               </div>
 
               <div class="card">
@@ -542,13 +616,13 @@
               <div class="card">
                 <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
                   <input type="text" id="cig-search" class="input-field" placeholder="Cari merk rokok..." oninput="renderCigarettes()" style="flex:1;padding:10px 14px;" />
-                  <button class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddCigModal()">+ Merk Rokok</button>
+                  <button type="button" class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddCigModal()">+ Merk Rokok</button>
                 </div>
                 <div class="chip-group" id="cig-categories">
-                  <button class="chip active" onclick="setCigCat('Semua', this)">Semua</button>
-                  <button class="chip" onclick="setCigCat('Filter / SKM', this)">Filter / SKM</button>
-                  <button class="chip" onclick="setCigCat('Kretek / SKT', this)">Kretek / SKT</button>
-                  <button class="chip" onclick="setCigCat('Mild / Putih', this)">Mild / Putih</button>
+                  <button type="button" class="chip active" onclick="setCigCat('Semua', this)">Semua</button>
+                  <button type="button" class="chip" onclick="setCigCat('Filter / SKM', this)">Filter / SKM</button>
+                  <button type="button" class="chip" onclick="setCigCat('Kretek / SKT', this)">Kretek / SKT</button>
+                  <button type="button" class="chip" onclick="setCigCat('Mild / Putih', this)">Mild / Putih</button>
                 </div>
                 <div class="snack-grid" id="cig-grid"></div>
               </div>
@@ -566,10 +640,10 @@
                     <span id="cig-cart-total">Rp 0</span>
                   </div>
                   <div class="form-row">
-                    <button class="btn btn-green" style="width:100%;" onclick="checkoutCigCart('Tunai')">Bayar Tunai</button>
+                    <button type="button" class="btn btn-green" style="width:100%;" onclick="checkoutCigCart('Tunai')">Bayar Tunai</button>
                     <div style="display:flex;gap:8px;">
-                      <button class="btn btn-primary btn-sm" style="flex:1;margin-top:0;" onclick="checkoutCigCart('QRIS')">Bayar QRIS</button>
-                      <button class="btn btn-orange btn-sm" style="flex:1;" onclick="checkoutCigCart('Kasbon')">Catat Kasbon</button>
+                      <button type="button" class="btn btn-primary btn-sm" style="flex:1;margin-top:0;" onclick="checkoutCigCart('QRIS')">Bayar QRIS</button>
+                      <button type="button" class="btn btn-orange btn-sm" style="flex:1;" onclick="checkoutCigCart('Kasbon')">Catat Kasbon</button>
                     </div>
                   </div>
                 </div>
@@ -577,7 +651,7 @@
             </div>
           </section>
 
-          <!-- SECTION 5: STOK & RESTICK ROKOK (ID 3 & ID 1) -->
+          <!-- SECTION 5: STOK & RESTOCK ROKOK (ID 3 & ID 1) -->
           <section id="sec-rokok-stok" class="section">
             <div class="card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
@@ -585,7 +659,7 @@
                   <h3 style="margin:0;font-size:17px;">Manajemen Stok & Restock Rokok</h3>
                   <div style="font-size:12px;color:var(--text-secondary);">Pantau stok bungkus, eceran batang, modal HPP, dan peringatan stok menipis</div>
                 </div>
-                <button class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddCigModal()">+ Tambah Merk</button>
+                <button type="button" class="btn btn-primary btn-sm" style="margin-top:0;width:auto;" onclick="openAddCigModal()">+ Tambah Merk</button>
               </div>
               <div id="cig-stock-list"></div>
             </div>
@@ -601,7 +675,7 @@
               <div class="card">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
                   <h3 style="margin:0;font-size:17px;">Riwayat Penjualan Rokok</h3>
-                  <button class="btn btn-ghost btn-sm" onclick="exportCigCSV()">Ekspor CSV</button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="exportCigCSV()">Ekspor CSV</button>
                 </div>
                 <div id="cig-history-list"></div>
               </div>
@@ -617,16 +691,16 @@
                   <div style="font-size:12px;color:var(--text-secondary);" id="laporan-subtitle"></div>
                 </div>
                 <div style="display:flex;gap:8px;">
-                  <button class="btn btn-ghost btn-sm" onclick="exportAllCSV()">Ekspor CSV</button>
-                  <button id="btn-clear-history" class="btn btn-red btn-sm" onclick="clearHistory()">Reset Semua Data</button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="exportAllCSV()">Ekspor CSV</button>
+                  <button type="button" id="btn-clear-history" class="btn btn-red btn-sm" onclick="clearHistory()">Reset Semua Data</button>
                 </div>
               </div>
               <div class="chip-group" id="owner-report-filters" style="margin-bottom:12px;display:none;">
-                <button class="chip active" onclick="setReportFilter('Semua', this)">Semua Lini</button>
-                <button class="chip" onclick="setReportFilter('Rental PS4', this)">Rental PS4</button>
-                <button class="chip" onclick="setReportFilter('Warung Jajan', this)">Warung Jajan</button>
-                <button class="chip" onclick="setReportFilter('Digital', this)">Digital</button>
-                <button class="chip" onclick="setReportFilter('Rokok', this)">Penjualan Rokok</button>
+                <button type="button" class="chip active" onclick="setReportFilter('Semua', this)">Semua Lini</button>
+                <button type="button" class="chip" onclick="setReportFilter('Rental PS4', this)">Rental PS4</button>
+                <button type="button" class="chip" onclick="setReportFilter('Warung Jajan', this)">Warung Jajan</button>
+                <button type="button" class="chip" onclick="setReportFilter('Digital', this)">Digital</button>
+                <button type="button" class="chip" onclick="setReportFilter('Rokok', this)">Penjualan Rokok</button>
               </div>
               <div id="all-history"></div>
             </div>
@@ -643,7 +717,7 @@
                     <input type="number" id="set-rate" class="input-field" />
                   </div>
                 </div>
-                <button class="btn btn-primary" onclick="saveSettings()">Simpan Tarif PS4</button>
+                <button type="button" class="btn btn-primary" onclick="saveSettings()">Simpan Tarif PS4</button>
               </div>
 
               <div class="card">
@@ -682,8 +756,8 @@
         <input type="number" id="new-snack-stock" class="input-field" placeholder="Stok awal" value="20" />
       </div>
       <div style="display:flex;gap:8px;margin-top:12px;">
-        <button class="btn btn-ghost" style="flex:1;" onclick="closeAddSnackModal()">Batal</button>
-        <button class="btn btn-primary" style="flex:1;margin-top:0;" onclick="saveNewSnack()">Simpan</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeAddSnackModal()">Batal</button>
+        <button type="button" class="btn btn-primary" style="flex:1;margin-top:0;" onclick="saveNewSnack()">Simpan</button>
       </div>
     </div>
   </div>
@@ -709,21 +783,24 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:12px;">
-        <button class="btn btn-ghost" style="flex:1;" onclick="closeAddCigModal()">Batal</button>
-        <button class="btn btn-primary" style="flex:1;margin-top:0;" onclick="saveNewCig()">Simpan</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeAddCigModal()">Batal</button>
+        <button type="button" class="btn btn-primary" style="flex:1;margin-top:0;" onclick="saveNewCig()">Simpan</button>
       </div>
     </div>
   </div>
 
   <script>
-    // 3 AKUN SESUAI PEMBAGIAN HAK AKSES
     const ACCOUNTS = {
       owner: { psw: "1234", role: "owner", label: "ID 1 • OWNER LENGKAP" },
+      "1": { psw: "1234", role: "owner", label: "ID 1 • OWNER LENGKAP" },
       admin: { psw: "1234", role: "admin", label: "ID 2 • KASIR PS & WARUNG" },
-      rokok: { psw: "1234", role: "rokok", label: "ID 3 • KHUSUS ROKOK" }
+      "2": { psw: "1234", role: "admin", label: "ID 2 • KASIR PS & WARUNG" },
+      rokok: { psw: "1234", role: "rokok", label: "ID 3 • KHUSUS ROKOK" },
+      "3": { psw: "1234", role: "rokok", label: "ID 3 • KHUSUS ROKOK" }
     };
 
-    const STORAGE_KEY = "kartama_point_pos_v3";
+    const STORAGE_KEY = "kartama_point_pos_v4";
+    let memoryFallback = null;
 
     let state = {
       user: null,
@@ -733,7 +810,6 @@
         { id: 1, name: "PS4 Unit 1", status: "idle", mode: "open", targetMinutes: 60, elapsedSeconds: 0, lastTick: null, snackBill: 0, snackNotes: [] },
         { id: 2, name: "PS4 Unit 2", status: "idle", mode: "open", targetMinutes: 60, elapsedSeconds: 0, lastTick: null, snackBill: 0, snackNotes: [] }
       ],
-      // Warung Jajan (Tanpa Rokok)
       snacks: [
         { id: 1, name: "Es Teh Manis", cat: "Minuman", price: 5000, stock: 30 },
         { id: 2, name: "Kopi Hitam / Susu", cat: "Minuman", price: 5000, stock: 25 },
@@ -744,7 +820,6 @@
         { id: 7, name: "Chitato / Lays", cat: "Camilan", price: 5000, stock: 18 },
         { id: 8, name: "Gorengan / Camilan", cat: "Camilan", price: 2000, stock: 30 }
       ],
-      // Database Khusus Rokok (ID 3 & ID 1)
       cigarettes: [
         { id: 101, name: "Gudang Garam Surya 16", cat: "Filter / SKM", cost: 32500, price: 35000, stickPrice: 2500, stock: 15 },
         { id: 102, name: "Sampoerna A Mild 16", cat: "Mild / Putih", cost: 33000, price: 36000, stickPrice: 2500, stock: 12 },
@@ -763,18 +838,22 @@
     };
 
     function loadState() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        try {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY) || memoryFallback;
+        if (raw) {
           const parsed = JSON.parse(raw);
           state = { ...state, ...parsed };
-        } catch (e) {}
-      }
+        }
+      } catch (e) {}
       document.documentElement.setAttribute("data-theme", state.theme || "light");
     }
 
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const serialized = JSON.stringify(state);
+      memoryFallback = serialized;
+      try {
+        localStorage.setItem(STORAGE_KEY, serialized);
+      } catch (e) {}
     }
 
     function formatRp(num) {
@@ -788,24 +867,79 @@
       return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
     }
 
-    // LOGIN
-    document.getElementById("login-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const id = document.getElementById("login-id").value.trim().toLowerCase();
-      const psw = document.getElementById("login-psw").value.trim();
+    let loginLoadingTimer = null;
+
+    function handleLogin() {
+      const idInput = document.getElementById("login-id");
+      const pswInput = document.getElementById("login-psw");
       const err = document.getElementById("login-error");
 
+      const id = (idInput.value || "").trim().toLowerCase();
+      const psw = (pswInput.value || "").trim();
+
+      if (!id || !psw) {
+        err.textContent = "Masukkan ID Pengguna dan Kata Sandi.";
+        return;
+      }
+
       if (ACCOUNTS[id] && ACCOUNTS[id].psw === psw) {
-        state.user = { id, role: ACCOUNTS[id].role, label: ACCOUNTS[id].label };
+        const account = ACCOUNTS[id];
+        state.user = { id: id, role: account.role, label: account.label };
         saveState();
         err.textContent = "";
-        document.getElementById("login-id").value = "";
-        document.getElementById("login-psw").value = "";
-        initApp();
+        idInput.value = "";
+        pswInput.value = "";
+
+        showLoginLoading(account, function() {
+          initApp();
+        });
       } else {
-        err.textContent = "ID Pengguna atau Kata Sandi salah.";
+        err.textContent = "ID atau Kata Sandi salah. (Gunakan: owner / admin / rokok — sandi: 1234)";
       }
-    });
+    }
+
+    function showLoginLoading(account, onComplete) {
+      if (loginLoadingTimer) clearInterval(loginLoadingTimer);
+
+      const loginView = document.getElementById("login-view");
+      const loadingView = document.getElementById("loading-view");
+      const loadingTitle = document.getElementById("loading-title");
+      const loadingSub = document.getElementById("loading-subtitle");
+      const loadingBar = document.getElementById("loading-bar");
+      const loadingStatus = document.getElementById("loading-status");
+
+      loginView.style.display = "none";
+      loadingView.style.display = "flex";
+      loadingTitle.textContent = "Selamat Datang, " + account.id.toUpperCase();
+      loadingSub.textContent = account.label;
+      loadingBar.style.width = "0%";
+
+      // Random duration between 1500ms (1.5s) and 5000ms (max 5.0s)
+      const durationMs = Math.floor(Math.random() * 3501) + 1500;
+      const startTime = Date.now();
+      const steps = [
+        "Memverifikasi hak akses...",
+        "Memuat modul operasional...",
+        "Menyiapkan data transaksi & stok...",
+        "Hampir selesai..."
+      ];
+
+      loginLoadingTimer = setInterval(function() {
+        const elapsed = Date.now() - startTime;
+        const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
+        loadingBar.style.width = pct + "%";
+
+        const stepIdx = Math.min(steps.length - 1, Math.floor((pct / 100) * steps.length));
+        loadingStatus.textContent = steps[stepIdx] + " (" + pct + "%)";
+
+        if (elapsed >= durationMs) {
+          clearInterval(loginLoadingTimer);
+          loginLoadingTimer = null;
+          loadingView.style.display = "none";
+          if (typeof onComplete === "function") onComplete();
+        }
+      }, 60);
+    }
 
     function logout() {
       state.user = null;
@@ -814,7 +948,6 @@
       document.getElementById("login-view").style.display = "flex";
     }
 
-    // KONFIGURASI MENU BERDASARKAN ROLE (ID 1, ID 2, ID 3)
     const ROLE_MENUS = {
       owner: [
         { id: "ps4", icon: "🎮", label: "PS4" },
@@ -849,12 +982,10 @@
 
       const menus = ROLE_MENUS[role] || [];
 
-      // Render Sidebar Nav (iPad)
-      document.getElementById("sidebar-nav").innerHTML = menus.map((m, i) => `
-        <button class="nav-item ${i === 0 ? "active" : ""}" data-tab="${m.id}" onclick="switchTab('${m.id}')">${m.icon} ${m.label}</button>
-      `).join("");
+      document.getElementById("sidebar-nav").innerHTML = menus.map(function(m, i) {
+        return '<button type="button" class="nav-item ' + (i === 0 ? 'active' : '') + '" data-tab="' + m.id + '" onclick="switchTab(\'' + m.id + '\')">' + m.icon + ' ' + m.label + '</button>';
+      }).join("");
 
-      // Render Bottom Tab Bar (iPhone - max 5 utama agar rapi)
       const mobileMenus = role === "owner"
         ? [
             { id: "ps4", icon: "🎮", label: "PS4" },
@@ -865,14 +996,11 @@
           ]
         : menus;
 
-      document.getElementById("bottom-bar").innerHTML = mobileMenus.map((m, i) => `
-        <button class="tab-btn ${i === 0 ? "active" : ""}" data-tab="${m.id}" onclick="switchTab('${m.id}')">
-          <span class="tab-icon">${m.icon}</span>
-          <span>${m.label}</span>
-        </button>
-      `).join("");
+      document.getElementById("bottom-bar").innerHTML = mobileMenus.map(function(m, i) {
+        return '<button type="button" class="tab-btn ' + (i === 0 ? 'active' : '') + '" data-tab="' + m.id + '" onclick="switchTab(\'' + m.id + '\')">' +
+               '<span class="tab-icon">' + m.icon + '</span><span>' + m.label + '</span></button>';
+      }).join("");
 
-      // Pengaturan eksklusif ID 1 (Owner)
       const isOwner = role === "owner";
       document.getElementById("set-rate").value = state.ratePerHour;
       document.getElementById("btn-add-snack").style.display = isOwner ? "inline-flex" : "none";
@@ -891,15 +1019,15 @@
         "rokok-pos": "Kasir Penjualan Rokok",
         "rokok-stok": "Stok & Restock Rokok",
         "rokok-kasbon": "Kasbon & Rekap Rokok",
-        laporan: state.user?.role === "owner" ? "Laporan Gabungan Owner" : "Laporan Shift (PS4, Warung, Digital)",
+        laporan: (state.user && state.user.role === "owner") ? "Laporan Gabungan Owner" : "Laporan Shift (PS4, Warung, Digital)",
         pengaturan: "Pengaturan Eksklusif Owner"
       };
       document.getElementById("page-title").textContent = titles[tab] || "Kartama Point";
-      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".section").forEach(function(s) { s.classList.remove("active"); });
       const targetSec = document.getElementById("sec-" + tab);
       if (targetSec) targetSec.classList.add("active");
 
-      document.querySelectorAll("[data-tab]").forEach(btn => {
+      document.querySelectorAll("[data-tab]").forEach(function(btn) {
         btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
       });
     }
@@ -910,80 +1038,45 @@
       saveState();
     }
 
-    // SUMMARY STRIP BERDASARKAN ROLE
     function updateStats() {
       const today = new Date().toISOString().slice(0, 10);
-      const todayTx = state.transactions.filter(t => t.date === today);
-      const role = state.user?.role;
+      const todayTx = state.transactions.filter(function(t) { return t.date === today; });
+      const role = state.user ? state.user.role : "";
       const strip = document.getElementById("stats-strip");
 
       if (role === "rokok") {
-        // ID 3: Hanya statistik rokok
-        const cigTx = todayTx.filter(t => t.category === "Rokok");
-        const omzet = cigTx.reduce((s, t) => s + t.amount, 0);
-        const laba = cigTx.reduce((s, t) => s + (t.profit || 0), 0);
-        const totalKasbon = state.cigKasbons.filter(k => !k.paid).reduce((s, k) => s + k.amount, 0);
-        const lowStock = state.cigarettes.filter(c => c.stock <= 5).length;
+        const cigTx = todayTx.filter(function(t) { return t.category === "Rokok"; });
+        const omzet = cigTx.reduce(function(s, t) { return s + t.amount; }, 0);
+        const laba = cigTx.reduce(function(s, t) { return s + (t.profit || 0); }, 0);
+        const totalKasbon = state.cigKasbons.filter(function(k) { return !k.paid; }).reduce(function(s, k) { return s + k.amount; }, 0);
+        const lowStock = state.cigarettes.filter(function(c) { return c.stock <= 5; }).length;
 
-        strip.innerHTML = `
-          <div class="stat-card">
-            <div class="stat-label">Omzet Rokok Hari Ini</div>
-            <div class="stat-value">${formatRp(omzet)}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Laba Bersih Rokok</div>
-            <div class="stat-value" style="color:var(--green);">${formatRp(laba)}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Kasbon Aktif / Stok Menipis</div>
-            <div class="stat-value">${formatRp(totalKasbon)} <span style="font-size:13px;color:var(--orange);">(${lowStock} merk)</span></div>
-          </div>
-        `;
+        strip.innerHTML =
+          '<div class="stat-card"><div class="stat-label">Omzet Rokok Hari Ini</div><div class="stat-value">' + formatRp(omzet) + '</div></div>' +
+          '<div class="stat-card"><div class="stat-label">Laba Bersih Rokok</div><div class="stat-value" style="color:var(--green);">' + formatRp(laba) + '</div></div>' +
+          '<div class="stat-card"><div class="stat-label">Kasbon Aktif / Stok Menipis</div><div class="stat-value">' + formatRp(totalKasbon) + ' <span style="font-size:13px;color:var(--orange);">(' + lowStock + ' merk)</span></div></div>';
       } else if (role === "admin") {
-        // ID 2: Hanya PS4, Warung, Digital (Tanpa Rokok)
-        const nonCigTx = todayTx.filter(t => t.category !== "Rokok");
-        const kasNonRokok = nonCigTx.reduce((s, t) => s + (t.profit || 0), 0);
-        const digitalProfit = nonCigTx.filter(t => t.category === "Digital").reduce((s, t) => s + (t.profit || 0), 0);
-        const activePs = state.psUnits.filter(u => u.status === "playing").length;
+        const nonCigTx = todayTx.filter(function(t) { return t.category !== "Rokok"; });
+        const kasNonRokok = nonCigTx.reduce(function(s, t) { return s + (t.profit || 0); }, 0);
+        const digitalProfit = nonCigTx.filter(function(t) { return t.category === "Digital"; }).reduce(function(s, t) { return s + (t.profit || 0); }, 0);
+        const activePs = state.psUnits.filter(function(u) { return u.status === "playing"; }).length;
 
-        strip.innerHTML = `
-          <div class="stat-card">
-            <div class="stat-label">Kas PS4, Warung & Digital</div>
-            <div class="stat-value">${formatRp(kasNonRokok)}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Unit PS4 Aktif</div>
-            <div class="stat-value">${activePs} / ${state.psUnits.length}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Laba Admin Digital</div>
-            <div class="stat-value" style="color:var(--green);">${formatRp(digitalProfit)}</div>
-          </div>
-        `;
+        strip.innerHTML =
+          '<div class="stat-card"><div class="stat-label">Kas PS4, Warung & Digital</div><div class="stat-value">' + formatRp(kasNonRokok) + '</div></div>' +
+          '<div class="stat-card"><div class="stat-label">Unit PS4 Aktif</div><div class="stat-value">' + activePs + ' / ' + state.psUnits.length + '</div></div>' +
+          '<div class="stat-card"><div class="stat-label">Laba Admin Digital</div><div class="stat-value" style="color:var(--green);">' + formatRp(digitalProfit) + '</div></div>';
       } else {
-        // ID 1 (Owner): Gabungan Semua Lini + Laba Bersih Total
-        const totalKas = todayTx.reduce((s, t) => s + (t.profit || 0), 0);
-        const omzetRokok = todayTx.filter(t => t.category === "Rokok").reduce((s, t) => s + t.amount, 0);
-        const activePs = state.psUnits.filter(u => u.status === "playing").length;
+        const totalKas = todayTx.reduce(function(s, t) { return s + (t.profit || 0); }, 0);
+        const omzetRokok = todayTx.filter(function(t) { return t.category === "Rokok"; }).reduce(function(s, t) { return s + t.amount; }, 0);
+        const activePs = state.psUnits.filter(function(u) { return u.status === "playing"; }).length;
 
-        strip.innerHTML = `
-          <div class="stat-card">
-            <div class="stat-label">Total Laba Bersih Semua Lini</div>
-            <div class="stat-value" style="color:var(--green);">${formatRp(totalKas)}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Omzet Rokok Hari Ini</div>
-            <div class="stat-value">${formatRp(omzetRokok)}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Unit PS4 Aktif</div>
-            <div class="stat-value">${activePs} / ${state.psUnits.length}</div>
-          </div>
-        `;
+        strip.innerHTML =
+          '<div class="stat-card"><div class="stat-label">Total Laba Bersih Semua Lini</div><div class="stat-value" style="color:var(--green);">' + formatRp(totalKas) + '</div></div>' +
+          '<div class="stat-card"><div class="stat-label">Omzet Rokok Hari Ini</div><div class="stat-value">' + formatRp(omzetRokok) + '</div></div>' +
+          '<div class="stat-card"><div class="stat-label">Unit PS4 Aktif</div><div class="stat-value">' + activePs + ' / ' + state.psUnits.length + '</div></div>';
       }
     }
 
-    // ==================== 1. RENTAL PS4 ====================
     function calcPsCost(unit) {
       if (unit.mode === "paket") {
         return Math.ceil((unit.targetMinutes / 60) * state.ratePerHour / 500) * 500;
@@ -994,7 +1087,7 @@
     }
 
     function startPs(id) {
-      const u = state.psUnits.find(x => x.id === id);
+      const u = state.psUnits.find(function(x) { return x.id === id; });
       if (!u) return;
       if (u.status === "idle") {
         const modeSel = document.getElementById("mode-ps-" + id);
@@ -1012,7 +1105,7 @@
     }
 
     function pausePs(id) {
-      const u = state.psUnits.find(x => x.id === id);
+      const u = state.psUnits.find(function(x) { return x.id === id; });
       if (!u || u.status !== "playing") return;
       u.status = "paused";
       u.lastTick = null;
@@ -1022,7 +1115,7 @@
     }
 
     function finishPs(id) {
-      const u = state.psUnits.find(x => x.id === id);
+      const u = state.psUnits.find(function(x) { return x.id === id; });
       if (!u) return;
       const rentalCost = calcPsCost(u);
       const total = rentalCost + u.snackBill;
@@ -1033,7 +1126,7 @@
           time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
           date: new Date().toISOString().slice(0, 10),
           category: "Rental PS4",
-          detail: `${u.name} (${formatTime(u.elapsedSeconds)})${u.snackBill > 0 ? " + Jajan " + formatRp(u.snackBill) : ""}`,
+          detail: u.name + " (" + formatTime(u.elapsedSeconds) + ")" + (u.snackBill > 0 ? " + Jajan " + formatRp(u.snackBill) : ""),
           amount: total,
           profit: total
         });
@@ -1050,51 +1143,51 @@
 
     function renderPs4() {
       const container = document.getElementById("ps4-container");
-      container.innerHTML = state.psUnits.map(u => {
+      container.innerHTML = state.psUnits.map(function(u) {
         const rentalCost = calcPsCost(u);
         const total = rentalCost + u.snackBill;
         const statusLabel = u.status === "playing" ? "Sedang Main" : u.status === "paused" ? "Dijeda" : "Kosong";
         const statusClass = u.status === "playing" ? "status-playing" : u.status === "paused" ? "status-paused" : "status-idle";
         const remaining = u.mode === "paket" ? Math.max(0, u.targetMinutes * 60 - u.elapsedSeconds) : null;
 
-        return `
-          <div class="card">
-            <div class="ps-header">
-              <strong style="font-size:18px;">${u.name}</strong>
-              <span class="status-pill ${statusClass}">${statusLabel}</span>
-            </div>
-            <div class="timer-display">${formatTime(u.elapsedSeconds)}</div>
-            ${u.mode === "paket" && u.status !== "idle" ? `<div style="font-size:12px;color:var(--orange);font-weight:600;">Sisa Paket: ${formatTime(remaining)}</div>` : ""}
-            ${u.status === "idle" ? `
-              <div style="margin:12px 0;">
-                <label class="field-label">Pilih Paket Main</label>
-                <select id="mode-ps-${u.id}" class="input-field" style="padding:10px 12px;">
-                  <option value="open">Open Billing (${formatRp(state.ratePerHour)}/jam)</option>
-                  <option value="60">Paket 1 Jam (${formatRp(state.ratePerHour)})</option>
-                  <option value="120">Paket 2 Jam (${formatRp(state.ratePerHour * 2)})</option>
-                  <option value="180">Paket 3 Jam (${formatRp(state.ratePerHour * 3)})</option>
-                </select>
-              </div>
-            ` : ""}
-            <div class="billing-box">
-              <div class="billing-row"><span>Biaya Sewa PS4</span><span>${formatRp(rentalCost)}</span></div>
-              <div class="billing-row"><span>Tambahan Jajan ${u.snackNotes.length ? `(${u.snackNotes.join(", ")})` : ""}</span><span>${formatRp(u.snackBill)}</span></div>
-              <div class="billing-row"><span>Total Tagihan</span><span style="color:var(--accent);">${formatRp(total)}</span></div>
-            </div>
-            <div class="control-row">
-              ${u.status !== "playing" ? `<button class="btn btn-green btn-sm" style="flex:1;" onclick="startPs(${u.id})">▶ Mulai</button>` : ""}
-              ${u.status === "playing" ? `<button class="btn btn-orange btn-sm" style="flex:1;" onclick="pausePs(${u.id})">⏸ Jeda</button>` : ""}
-              ${u.status !== "idle" ? `<button class="btn btn-red btn-sm" style="flex:1;" onclick="finishPs(${u.id})">✓ Selesai & Bayar</button>` : ""}
-            </div>
-          </div>
-        `;
+        let modeSelectHtml = "";
+        if (u.status === "idle") {
+          modeSelectHtml =
+            '<div style="margin:12px 0;">' +
+              '<label class="field-label">Pilih Paket Main</label>' +
+              '<select id="mode-ps-' + u.id + '" class="input-field" style="padding:10px 12px;">' +
+                '<option value="open">Open Billing (' + formatRp(state.ratePerHour) + '/jam)</option>' +
+                '<option value="60">Paket 1 Jam (' + formatRp(state.ratePerHour) + ')</option>' +
+                '<option value="120">Paket 2 Jam (' + formatRp(state.ratePerHour * 2) + ')</option>' +
+                '<option value="180">Paket 3 Jam (' + formatRp(state.ratePerHour * 3) + ')</option>' +
+              '</select>' +
+            '</div>';
+        }
+
+        return (
+          '<div class="card">' +
+            '<div class="ps-header"><strong style="font-size:18px;">' + u.name + '</strong><span class="status-pill ' + statusClass + '">' + statusLabel + '</span></div>' +
+            '<div class="timer-display">' + formatTime(u.elapsedSeconds) + '</div>' +
+            (u.mode === "paket" && u.status !== "idle" ? '<div style="font-size:12px;color:var(--orange);font-weight:600;">Sisa Paket: ' + formatTime(remaining) + '</div>' : '') +
+            modeSelectHtml +
+            '<div class="billing-box">' +
+              '<div class="billing-row"><span>Biaya Sewa PS4</span><span>' + formatRp(rentalCost) + '</span></div>' +
+              '<div class="billing-row"><span>Tambahan Jajan ' + (u.snackNotes.length ? '(' + u.snackNotes.join(", ") + ')' : '') + '</span><span>' + formatRp(u.snackBill) + '</span></div>' +
+              '<div class="billing-row"><span>Total Tagihan</span><span style="color:var(--accent);">' + formatRp(total) + '</span></div>' +
+            '</div>' +
+            '<div class="control-row">' +
+              (u.status !== "playing" ? '<button type="button" class="btn btn-green btn-sm" style="flex:1;" onclick="startPs(' + u.id + ')">▶ Mulai</button>' : '') +
+              (u.status === "playing" ? '<button type="button" class="btn btn-orange btn-sm" style="flex:1;" onclick="pausePs(' + u.id + ')">⏸ Jeda</button>' : '') +
+              (u.status !== "idle" ? '<button type="button" class="btn btn-red btn-sm" style="flex:1;" onclick="finishPs(' + u.id + ')">✓ Selesai & Bayar</button>' : '') +
+            '</div>' +
+          '</div>'
+        );
       }).join("");
     }
 
-    // ==================== 2. WARUNG JAJAN (NON-ROKOK) ====================
     function setSnackCat(cat, el) {
       state.selectedCat = cat;
-      document.querySelectorAll("#snack-categories .chip").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll("#snack-categories .chip").forEach(function(c) { c.classList.remove("active"); });
       el.classList.add("active");
       renderSnacks();
     }
@@ -1102,35 +1195,34 @@
     function renderSnacks() {
       const q = (document.getElementById("snack-search").value || "").toLowerCase();
       const grid = document.getElementById("snack-grid");
-      const filtered = state.snacks.filter(s => {
+      const filtered = state.snacks.filter(function(s) {
         const matchCat = state.selectedCat === "Semua" || s.cat === state.selectedCat;
         const matchQ = s.name.toLowerCase().includes(q);
         return matchCat && matchQ;
       });
-      grid.innerHTML = filtered.map(s => `
-        <div class="snack-item clickable" onclick="addToCart(${s.id})">
-          <div>
-            <div class="snack-name">${s.name}</div>
-            <div class="snack-price">${formatRp(s.price)}</div>
-          </div>
-          <div class="snack-stock">Stok: ${s.stock}</div>
-        </div>
-      `).join("");
+      grid.innerHTML = filtered.map(function(s) {
+        return (
+          '<div class="snack-item clickable" onclick="addToCart(' + s.id + ')">' +
+            '<div><div class="snack-name">' + s.name + '</div><div class="snack-price">' + formatRp(s.price) + '</div></div>' +
+            '<div class="snack-stock">Stok: ' + s.stock + '</div>' +
+          '</div>'
+        );
+      }).join("");
     }
 
     function addToCart(snackId) {
-      const snack = state.snacks.find(s => s.id === snackId);
+      const snack = state.snacks.find(function(s) { return s.id === snackId; });
       if (!snack || snack.stock <= 0) return;
-      const existing = state.cart.find(c => c.id === snackId);
+      const existing = state.cart.find(function(c) { return c.id === snackId; });
       if (existing) { if (existing.qty < snack.stock) existing.qty++; }
       else state.cart.push({ id: snack.id, name: snack.name, price: snack.price, qty: 1 });
       renderCart();
     }
 
     function updateCartQty(snackId, delta) {
-      const idx = state.cart.findIndex(c => c.id === snackId);
+      const idx = state.cart.findIndex(function(c) { return c.id === snackId; });
       if (idx === -1) return;
-      const snack = state.snacks.find(s => s.id === snackId);
+      const snack = state.snacks.find(function(s) { return s.id === snackId; });
       state.cart[idx].qty += delta;
       if (state.cart[idx].qty <= 0) state.cart.splice(idx, 1);
       else if (snack && state.cart[idx].qty > snack.stock) state.cart[idx].qty = snack.stock;
@@ -1141,51 +1233,47 @@
       const list = document.getElementById("cart-list");
       const totalEl = document.getElementById("cart-total");
       if (!state.cart.length) {
-        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;text-align:center;padding:30px 0;">Belum ada item dipilih</div>`;
+        list.innerHTML = '<div style="color:var(--text-secondary);font-size:14px;text-align:center;padding:30px 0;">Belum ada item dipilih</div>';
         totalEl.textContent = "Rp 0";
         return;
       }
       let total = 0;
-      list.innerHTML = state.cart.map(c => {
+      list.innerHTML = state.cart.map(function(c) {
         const sub = c.price * c.qty;
         total += sub;
-        return `
-          <div class="cart-item">
-            <div>
-              <div style="font-weight:600;font-size:14px;">${c.name}</div>
-              <div style="font-size:12px;color:var(--text-secondary);">${formatRp(c.price)} × ${c.qty}</div>
-            </div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="updateCartQty(${c.id}, -1)">-</button>
-              <span style="font-weight:700;min-width:18px;text-align:center;">${c.qty}</span>
-              <button class="qty-btn" onclick="updateCartQty(${c.id}, 1)">+</button>
-            </div>
-          </div>
-        `;
+        return (
+          '<div class="cart-item">' +
+            '<div><div style="font-weight:600;font-size:14px;">' + c.name + '</div><div style="font-size:12px;color:var(--text-secondary);">' + formatRp(c.price) + ' × ' + c.qty + '</div></div>' +
+            '<div class="qty-controls">' +
+              '<button type="button" class="qty-btn" onclick="updateCartQty(' + c.id + ', -1)">-</button>' +
+              '<span style="font-weight:700;min-width:18px;text-align:center;">' + c.qty + '</span>' +
+              '<button type="button" class="qty-btn" onclick="updateCartQty(' + c.id + ', 1)">+</button>' +
+            '</div>' +
+          '</div>'
+        );
       }).join("");
       totalEl.textContent = formatRp(total);
     }
 
     function checkoutCart(target) {
       if (!state.cart.length) return;
-      const total = state.cart.reduce((sum, c) => sum + c.price * c.qty, 0);
-      const summary = state.cart.map(c => `${c.name} (${c.qty})`).join(", ");
+      const total = state.cart.reduce(function(sum, c) { return sum + c.price * c.qty; }, 0);
+      const summary = state.cart.map(function(c) { return c.name + " (" + c.qty + ")"; }).join(", ");
 
-      state.cart.forEach(c => {
-        const s = state.snacks.find(x => x.id === c.id);
+      state.cart.forEach(function(c) {
+        const s = state.snacks.find(function(x) { return x.id === c.id; });
         if (s) s.stock = Math.max(0, s.stock - c.qty);
       });
 
       if (target === "ps1" || target === "ps2") {
         const unitId = target === "ps1" ? 1 : 2;
-        const unit = state.psUnits.find(u => u.id === unitId);
+        const unit = state.psUnits.find(function(u) { return u.id === unitId; });
         if (unit && unit.status !== "idle") {
           unit.snackBill += total;
           unit.snackNotes.push(summary);
           state.cart = [];
           saveState();
           renderAll();
-          alert(`Tagihan jajan (${formatRp(total)}) digabungkan ke ${unit.name}.`);
           return;
         }
       }
@@ -1213,7 +1301,7 @@
       const price = parseInt(document.getElementById("new-snack-price").value, 10);
       const stock = parseInt(document.getElementById("new-snack-stock").value, 10) || 0;
       if (!name || !price) return;
-      state.snacks.push({ id: Date.now(), name, cat, price, stock });
+      state.snacks.push({ id: Date.now(), name: name, cat: cat, price: price, stock: stock });
       document.getElementById("new-snack-name").value = "";
       document.getElementById("new-snack-price").value = "";
       closeAddSnackModal();
@@ -1221,7 +1309,6 @@
       renderSnacks();
     }
 
-    // ==================== 3. TRANSAKSI DIGITAL ====================
     function addDigitalTx() {
       const type = document.getElementById("dig-type").value;
       const note = document.getElementById("dig-note").value.trim();
@@ -1234,7 +1321,7 @@
         time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
         date: new Date().toISOString().slice(0, 10),
         category: "Digital",
-        detail: `${type}${note ? " - " + note : ""} (Pokok ${formatRp(amount)})`,
+        detail: type + (note ? " - " + note : "") + " (Pokok " + formatRp(amount) + ")",
         amount: amount + fee,
         profit: fee
       });
@@ -1249,26 +1336,25 @@
     function renderDigitalHistory() {
       const list = document.getElementById("digital-history");
       const today = new Date().toISOString().slice(0, 10);
-      const items = state.transactions.filter(t => t.category === "Digital" && t.date === today);
+      const items = state.transactions.filter(function(t) { return t.category === "Digital" && t.date === today; });
       if (!items.length) {
-        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Belum ada transaksi digital hari ini.</div>`;
+        list.innerHTML = '<div style="color:var(--text-secondary);font-size:14px;">Belum ada transaksi digital hari ini.</div>';
         return;
       }
-      list.innerHTML = items.map(t => `
-        <div class="history-item">
-          <div>
-            <div style="font-weight:600;font-size:14px;">${t.detail}</div>
-            <div style="font-size:12px;color:var(--text-secondary);">${t.time} • Laba Admin: <strong style="color:var(--green);">${formatRp(t.profit)}</strong></div>
-          </div>
-          <div style="font-weight:700;">${formatRp(t.amount)}</div>
-        </div>
-      `).join("");
+      list.innerHTML = items.map(function(t) {
+        return (
+          '<div class="history-item">' +
+            '<div><div style="font-weight:600;font-size:14px;">' + t.detail + '</div>' +
+            '<div style="font-size:12px;color:var(--text-secondary);">' + t.time + ' • Laba Admin: <strong style="color:var(--green);">' + formatRp(t.profit) + '</strong></div></div>' +
+            '<div style="font-weight:700;">' + formatRp(t.amount) + '</div>' +
+          '</div>'
+        );
+      }).join("");
     }
 
-    // ==================== 4. KHUSUS PENJUALAN ROKOK (ID 3 & ID 1) ====================
     function setCigCat(cat, el) {
       state.selectedCigCat = cat;
-      document.querySelectorAll("#cig-categories .chip").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll("#cig-categories .chip").forEach(function(c) { c.classList.remove("active"); });
       el.classList.add("active");
       renderCigarettes();
     }
@@ -1276,46 +1362,44 @@
     function renderCigarettes() {
       const q = (document.getElementById("cig-search").value || "").toLowerCase();
       const grid = document.getElementById("cig-grid");
-      const filtered = state.cigarettes.filter(c => {
+      const filtered = state.cigarettes.filter(function(c) {
         const matchCat = state.selectedCigCat === "Semua" || c.cat === state.selectedCigCat;
         const matchQ = c.name.toLowerCase().includes(q);
         return matchCat && matchQ;
       });
 
-      grid.innerHTML = filtered.map(c => {
-        const lowBadge = c.stock <= 5 ? `<span class="badge badge-red">Sisa ${c.stock}</span>` : `<span style="font-size:11px;color:var(--text-secondary);">Stok: ${c.stock} bks</span>`;
-        return `
-          <div class="snack-item">
-            <div>
-              <div class="snack-name">${c.name}</div>
-              <div class="snack-price">${formatRp(c.price)} / bks</div>
-              <div style="margin-top:4px;">${lowBadge}</div>
-            </div>
-            <div style="display:flex;gap:6px;margin-top:10px;">
-              <button class="btn btn-primary btn-sm" style="flex:1;margin-top:0;" onclick="addCigToCart(${c.id}, 'bks')">+ Bks</button>
-              ${c.stickPrice ? `<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="addCigToCart(${c.id}, 'btg')">+ Btg (${formatRp(c.stickPrice)})</button>` : ""}
-            </div>
-          </div>
-        `;
+      grid.innerHTML = filtered.map(function(c) {
+        const lowBadge = c.stock <= 5
+          ? '<span class="badge badge-red">Sisa ' + c.stock + '</span>'
+          : '<span style="font-size:11px;color:var(--text-secondary);">Stok: ' + c.stock + ' bks</span>';
+        return (
+          '<div class="snack-item">' +
+            '<div><div class="snack-name">' + c.name + '</div><div class="snack-price">' + formatRp(c.price) + ' / bks</div><div style="margin-top:4px;">' + lowBadge + '</div></div>' +
+            '<div style="display:flex;gap:6px;margin-top:10px;">' +
+              '<button type="button" class="btn btn-primary btn-sm" style="flex:1;margin-top:0;" onclick="addCigToCart(' + c.id + ', \'bks\')">+ Bks</button>' +
+              (c.stickPrice ? '<button type="button" class="btn btn-ghost btn-sm" style="flex:1;" onclick="addCigToCart(' + c.id + ', \'btg\')">+ Btg (' + formatRp(c.stickPrice) + ')</button>' : '') +
+            '</div>' +
+          '</div>'
+        );
       }).join("");
     }
 
     function addCigToCart(cigId, unitType) {
-      const cig = state.cigarettes.find(c => c.id === cigId);
-      if (!cig || cig.stock <= 0) { alert("Stok bungkus habis!"); return; }
-      const key = `${cigId}_${unitType}`;
+      const cig = state.cigarettes.find(function(c) { return c.id === cigId; });
+      if (!cig || cig.stock <= 0) return;
+      const key = cigId + "_" + unitType;
       const price = unitType === "bks" ? cig.price : cig.stickPrice;
       const cost = unitType === "bks" ? cig.cost : Math.round(cig.cost / 16);
-      const label = unitType === "bks" ? `${cig.name} (1 Bks)` : `${cig.name} (Ecer Batang)`;
+      const label = unitType === "bks" ? cig.name + " (1 Bks)" : cig.name + " (Ecer Batang)";
 
-      const existing = state.cigCart.find(x => x.key === key);
+      const existing = state.cigCart.find(function(x) { return x.key === key; });
       if (existing) existing.qty++;
-      else state.cigCart.push({ key, cigId, unitType, label, price, cost, qty: 1 });
+      else state.cigCart.push({ key: key, cigId: cigId, unitType: unitType, label: label, price: price, cost: cost, qty: 1 });
       renderCigCart();
     }
 
     function updateCigCartQty(key, delta) {
-      const idx = state.cigCart.findIndex(x => x.key === key);
+      const idx = state.cigCart.findIndex(function(x) { return x.key === key; });
       if (idx === -1) return;
       state.cigCart[idx].qty += delta;
       if (state.cigCart[idx].qty <= 0) state.cigCart.splice(idx, 1);
@@ -1328,7 +1412,7 @@
       const profitEl = document.getElementById("cig-cart-profit");
 
       if (!state.cigCart.length) {
-        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;text-align:center;padding:30px 0;">Pilih rokok (bungkus / ecer batang)</div>`;
+        list.innerHTML = '<div style="color:var(--text-secondary);font-size:14px;text-align:center;padding:30px 0;">Pilih rokok (bungkus / ecer batang)</div>';
         totalEl.textContent = "Rp 0";
         profitEl.textContent = "Rp 0";
         return;
@@ -1336,24 +1420,21 @@
 
       let total = 0;
       let profit = 0;
-      list.innerHTML = state.cigCart.map(c => {
+      list.innerHTML = state.cigCart.map(function(c) {
         const sub = c.price * c.qty;
         const subProfit = (c.price - c.cost) * c.qty;
         total += sub;
         profit += subProfit;
-        return `
-          <div class="cart-item">
-            <div>
-              <div style="font-weight:600;font-size:14px;">${c.label}</div>
-              <div style="font-size:12px;color:var(--text-secondary);">${formatRp(c.price)} × ${c.qty} (Laba ${formatRp(subProfit)})</div>
-            </div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="updateCigCartQty('${c.key}', -1)">-</button>
-              <span style="font-weight:700;min-width:18px;text-align:center;">${c.qty}</span>
-              <button class="qty-btn" onclick="updateCigCartQty('${c.key}', 1)">+</button>
-            </div>
-          </div>
-        `;
+        return (
+          '<div class="cart-item">' +
+            '<div><div style="font-weight:600;font-size:14px;">' + c.label + '</div><div style="font-size:12px;color:var(--text-secondary);">' + formatRp(c.price) + ' × ' + c.qty + ' (Laba ' + formatRp(subProfit) + ')</div></div>' +
+            '<div class="qty-controls">' +
+              '<button type="button" class="qty-btn" onclick="updateCigCartQty(\'' + c.key + '\', -1)">-</button>' +
+              '<span style="font-weight:700;min-width:18px;text-align:center;">' + c.qty + '</span>' +
+              '<button type="button" class="qty-btn" onclick="updateCigCartQty(\'' + c.key + '\', 1)">+</button>' +
+            '</div>' +
+          '</div>'
+        );
       }).join("");
       totalEl.textContent = formatRp(total);
       profitEl.textContent = formatRp(profit);
@@ -1361,9 +1442,9 @@
 
     function checkoutCigCart(method) {
       if (!state.cigCart.length) return;
-      const total = state.cigCart.reduce((s, c) => s + c.price * c.qty, 0);
-      const profit = state.cigCart.reduce((s, c) => s + (c.price - c.cost) * c.qty, 0);
-      const summary = state.cigCart.map(c => `${c.label} ×${c.qty}`).join(", ");
+      const total = state.cigCart.reduce(function(s, c) { return s + c.price * c.qty; }, 0);
+      const profit = state.cigCart.reduce(function(s, c) { return s + (c.price - c.cost) * c.qty; }, 0);
+      const summary = state.cigCart.map(function(c) { return c.label + " ×" + c.qty; }).join(", ");
 
       let customerName = "";
       if (method === "Kasbon") {
@@ -1371,9 +1452,8 @@
         if (!customerName) return;
       }
 
-      // Kurangi stok bungkus
-      state.cigCart.forEach(item => {
-        const cig = state.cigarettes.find(c => c.id === item.cigId);
+      state.cigCart.forEach(function(item) {
+        const cig = state.cigarettes.find(function(c) { return c.id === item.cigId; });
         if (cig && item.unitType === "bks") {
           cig.stock = Math.max(0, cig.stock - item.qty);
         }
@@ -1395,7 +1475,7 @@
           time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
           date: new Date().toISOString().slice(0, 10),
           category: "Rokok",
-          detail: `[${method}] ${summary}`,
+          detail: "[" + method + "] " + summary,
           amount: total,
           profit: profit
         });
@@ -1408,28 +1488,24 @@
 
     function renderCigStockList() {
       const container = document.getElementById("cig-stock-list");
-      container.innerHTML = state.cigarettes.map(c => {
+      container.innerHTML = state.cigarettes.map(function(c) {
         const margin = c.price - c.cost;
-        return `
-          <div class="history-item">
-            <div>
-              <div style="font-weight:700;font-size:15px;">${c.name} <span class="badge">${c.cat}</span></div>
-              <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">
-                Modal: ${formatRp(c.cost)} • Jual: ${formatRp(c.price)} • Laba/Bks: <strong style="color:var(--green);">${formatRp(margin)}</strong>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="badge ${c.stock <= 5 ? "badge-red" : "badge-green"}">${c.stock} Bks</span>
-              <button class="btn btn-ghost btn-sm" onclick="restockCig(${c.id}, 1)">+1 Bks</button>
-              <button class="btn btn-primary btn-sm" style="margin-top:0;" onclick="restockCig(${c.id}, 10)">+1 Slop (10)</button>
-            </div>
-          </div>
-        `;
+        return (
+          '<div class="history-item">' +
+            '<div><div style="font-weight:700;font-size:15px;">' + c.name + ' <span class="badge">' + c.cat + '</span></div>' +
+            '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Modal: ' + formatRp(c.cost) + ' • Jual: ' + formatRp(c.price) + ' • Laba/Bks: <strong style="color:var(--green);">' + formatRp(margin) + '</strong></div></div>' +
+            '<div style="display:flex;align-items:center;gap:8px;">' +
+              '<span class="badge ' + (c.stock <= 5 ? 'badge-red' : 'badge-green') + '">' + c.stock + ' Bks</span>' +
+              '<button type="button" class="btn btn-ghost btn-sm" onclick="restockCig(' + c.id + ', 1)">+1 Bks</button>' +
+              '<button type="button" class="btn btn-primary btn-sm" style="margin-top:0;" onclick="restockCig(' + c.id + ', 10)">+1 Slop (10)</button>' +
+            '</div>' +
+          '</div>'
+        );
       }).join("");
     }
 
     function restockCig(id, qty) {
-      const cig = state.cigarettes.find(c => c.id === id);
+      const cig = state.cigarettes.find(function(c) { return c.id === id; });
       if (!cig) return;
       cig.stock += qty;
       saveState();
@@ -1438,43 +1514,41 @@
 
     function renderCigKasbonAndHistory() {
       const kbList = document.getElementById("cig-kasbon-list");
-      const activeKb = state.cigKasbons.filter(k => !k.paid);
+      const activeKb = state.cigKasbons.filter(function(k) { return !k.paid; });
       if (!activeKb.length) {
-        kbList.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Tidak ada kasbon rokok yang belum lunas.</div>`;
+        kbList.innerHTML = '<div style="color:var(--text-secondary);font-size:14px;">Tidak ada kasbon rokok yang belum lunas.</div>';
       } else {
-        kbList.innerHTML = activeKb.map(k => `
-          <div class="history-item">
-            <div>
-              <div style="font-weight:700;font-size:14px;">${k.name} <span class="badge badge-orange">Belum Lunas</span></div>
-              <div style="font-size:12px;color:var(--text-secondary);">${k.detail} (${k.date})</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-weight:700;margin-bottom:4px;">${formatRp(k.amount)}</div>
-              <button class="btn btn-green btn-sm" onclick="payCigKasbon(${k.id})">Lunasi</button>
-            </div>
-          </div>
-        `).join("");
+        kbList.innerHTML = activeKb.map(function(k) {
+          return (
+            '<div class="history-item">' +
+              '<div><div style="font-weight:700;font-size:14px;">' + k.name + ' <span class="badge badge-orange">Belum Lunas</span></div>' +
+              '<div style="font-size:12px;color:var(--text-secondary);">' + k.detail + ' (' + k.date + ')</div></div>' +
+              '<div style="text-align:right;"><div style="font-weight:700;margin-bottom:4px;">' + formatRp(k.amount) + '</div>' +
+              '<button type="button" class="btn btn-green btn-sm" onclick="payCigKasbon(' + k.id + ')">Lunasi</button></div>' +
+            '</div>'
+          );
+        }).join("");
       }
 
       const histList = document.getElementById("cig-history-list");
-      const cigTx = state.transactions.filter(t => t.category === "Rokok");
+      const cigTx = state.transactions.filter(function(t) { return t.category === "Rokok"; });
       if (!cigTx.length) {
-        histList.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Belum ada transaksi rokok.</div>`;
+        histList.innerHTML = '<div style="color:var(--text-secondary);font-size:14px;">Belum ada transaksi rokok.</div>';
       } else {
-        histList.innerHTML = cigTx.map(t => `
-          <div class="history-item">
-            <div>
-              <div style="font-weight:600;font-size:14px;">${t.detail}</div>
-              <div style="font-size:12px;color:var(--text-secondary);">${t.date} • ${t.time} • Laba: <strong style="color:var(--green);">${formatRp(t.profit)}</strong></div>
-            </div>
-            <div style="font-weight:700;">${formatRp(t.amount)}</div>
-          </div>
-        `).join("");
+        histList.innerHTML = cigTx.map(function(t) {
+          return (
+            '<div class="history-item">' +
+              '<div><div style="font-weight:600;font-size:14px;">' + t.detail + '</div>' +
+              '<div style="font-size:12px;color:var(--text-secondary);">' + t.date + ' • ' + t.time + ' • Laba: <strong style="color:var(--green);">' + formatRp(t.profit) + '</strong></div></div>' +
+              '<div style="font-weight:700;">' + formatRp(t.amount) + '</div>' +
+            '</div>'
+          );
+        }).join("");
       }
     }
 
     function payCigKasbon(id) {
-      const kb = state.cigKasbons.find(k => k.id === id);
+      const kb = state.cigKasbons.find(function(k) { return k.id === id; });
       if (!kb) return;
       kb.paid = true;
       state.transactions.unshift({
@@ -1482,7 +1556,7 @@
         time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
         date: new Date().toISOString().slice(0, 10),
         category: "Rokok",
-        detail: `[Pelunasan Kasbon: ${kb.name}] ${kb.detail}`,
+        detail: "[Pelunasan Kasbon: " + kb.name + "] " + kb.detail,
         amount: kb.amount,
         profit: kb.profit
       });
@@ -1500,7 +1574,7 @@
       const stickPrice = parseInt(document.getElementById("new-cig-stick").value, 10) || 0;
       const stock = parseInt(document.getElementById("new-cig-stock").value, 10) || 0;
       if (!name || !price) return;
-      state.cigarettes.push({ id: Date.now(), name, cat, cost, price, stickPrice, stock });
+      state.cigarettes.push({ id: Date.now(), name: name, cat: cat, cost: cost, price: price, stickPrice: stickPrice, stock: stock });
       document.getElementById("new-cig-name").value = "";
       document.getElementById("new-cig-cost").value = "";
       document.getElementById("new-cig-price").value = "";
@@ -1510,63 +1584,58 @@
       renderAll();
     }
 
-    // ==================== 5. LAPORAN & PENGATURAN OWNER ====================
     function setReportFilter(cat, el) {
       state.reportFilter = cat;
-      document.querySelectorAll("#owner-report-filters .chip").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll("#owner-report-filters .chip").forEach(function(c) { c.classList.remove("active"); });
       el.classList.add("active");
       renderAllHistory();
     }
 
     function renderAllHistory() {
       const list = document.getElementById("all-history");
-      const role = state.user?.role;
+      const role = state.user ? state.user.role : "";
       let items = state.transactions;
 
       if (role === "admin") {
-        // ID 2 tidak boleh melihat laporan rokok
-        items = items.filter(t => t.category !== "Rokok");
+        items = items.filter(function(t) { return t.category !== "Rokok"; });
         document.getElementById("laporan-subtitle").textContent = "Menampilkan transaksi Rental PS4, Warung Jajan, dan Transaksi Digital";
       } else if (role === "owner") {
         document.getElementById("laporan-subtitle").textContent = "Akses Penuh Owner — Gabungan semua lini usaha";
         if (state.reportFilter !== "Semua") {
-          items = items.filter(t => t.category === state.reportFilter);
+          items = items.filter(function(t) { return t.category === state.reportFilter; });
         }
       }
 
       if (!items.length) {
-        list.innerHTML = `<div style="color:var(--text-secondary);font-size:14px;">Belum ada riwayat transaksi.</div>`;
+        list.innerHTML = '<div style="color:var(--text-secondary);font-size:14px;">Belum ada riwayat transaksi.</div>';
         return;
       }
 
-      list.innerHTML = items.map(t => `
-        <div class="history-item">
-          <div>
-            <span class="badge" style="margin-right:6px;">${t.category}</span>
-            <span style="font-weight:600;font-size:14px;">${t.detail}</span>
-            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">${t.date} • ${t.time}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-weight:700;">${formatRp(t.amount)}</div>
-            <div style="font-size:11px;color:var(--green);">Laba/Masuk Kas: ${formatRp(t.profit)}</div>
-          </div>
-        </div>
-      `).join("");
+      list.innerHTML = items.map(function(t) {
+        return (
+          '<div class="history-item">' +
+            '<div><span class="badge" style="margin-right:6px;">' + t.category + '</span>' +
+            '<span style="font-weight:600;font-size:14px;">' + t.detail + '</span>' +
+            '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">' + t.date + ' • ' + t.time + '</div></div>' +
+            '<div style="text-align:right;"><div style="font-weight:700;">' + formatRp(t.amount) + '</div>' +
+            '<div style="font-size:11px;color:var(--green);">Laba/Masuk Kas: ' + formatRp(t.profit) + '</div></div>' +
+          '</div>'
+        );
+      }).join("");
     }
 
     function saveSettings() {
-      if (state.user?.role !== "owner") return;
+      if (!state.user || state.user.role !== "owner") return;
       const val = parseInt(document.getElementById("set-rate").value, 10);
       if (val && val > 0) {
         state.ratePerHour = val;
         saveState();
         renderPs4();
-        alert("Tarif PS4 berhasil diperbarui.");
       }
     }
 
     function clearHistory() {
-      if (state.user?.role !== "owner") return;
+      if (!state.user || state.user.role !== "owner") return;
       if (confirm("Hapus seluruh riwayat transaksi semua lini?")) {
         state.transactions = [];
         state.cigKasbons = [];
@@ -1577,25 +1646,25 @@
 
     function exportCigCSV() {
       const rows = [["Tanggal", "Jam", "Detail Penjualan Rokok", "Omzet", "Laba Bersih"]];
-      state.transactions.filter(t => t.category === "Rokok").forEach(t => {
-        rows.push([t.date, t.time, `"${t.detail.replace(/"/g, '""')}"`, t.amount, t.profit]);
+      state.transactions.filter(function(t) { return t.category === "Rokok"; }).forEach(function(t) {
+        rows.push([t.date, t.time, '"' + t.detail.replace(/"/g, '""') + '"', t.amount, t.profit]);
       });
-      downloadCSV(rows, `laporan-rokok-kartama-${new Date().toISOString().slice(0, 10)}.csv`);
+      downloadCSV(rows, "laporan-rokok-kartama-" + new Date().toISOString().slice(0, 10) + ".csv");
     }
 
     function exportAllCSV() {
-      const role = state.user?.role;
+      const role = state.user ? state.user.role : "";
       const rows = [["Tanggal", "Jam", "Kategori", "Detail", "Total", "Laba/Masuk Kas"]];
-      const source = role === "admin" ? state.transactions.filter(t => t.category !== "Rokok") : state.transactions;
-      source.forEach(t => {
-        rows.push([t.date, t.time, t.category, `"${t.detail.replace(/"/g, '""')}"`, t.amount, t.profit]);
+      const source = role === "admin" ? state.transactions.filter(function(t) { return t.category !== "Rokok"; }) : state.transactions;
+      source.forEach(function(t) {
+        rows.push([t.date, t.time, t.category, '"' + t.detail.replace(/"/g, '""') + '"', t.amount, t.profit]);
       });
-      downloadCSV(rows, `laporan-kartama-point-${new Date().toISOString().slice(0, 10)}.csv`);
+      downloadCSV(rows, "laporan-kartama-point-" + new Date().toISOString().slice(0, 10) + ".csv");
     }
 
     function downloadCSV(rows, filename) {
-      const csv = rows.map(r => r.join(",")).join("
-");
+      const newline = String.fromCharCode(10);
+      const csv = rows.map(function(r) { return r.join(","); }).join(newline);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1617,11 +1686,10 @@
       updateStats();
     }
 
-    // LIVE TIMER TICKER PS4
-    setInterval(() => {
+    setInterval(function() {
       let changed = false;
       const now = Date.now();
-      state.psUnits.forEach(u => {
+      state.psUnits.forEach(function(u) {
         if (u.status === "playing") {
           const diff = u.lastTick ? Math.max(1, Math.floor((now - u.lastTick) / 1000)) : 1;
           u.elapsedSeconds += diff;
