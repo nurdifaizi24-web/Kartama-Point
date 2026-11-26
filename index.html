@@ -474,7 +474,7 @@
         <div class="input-group">
           <input type="password" id="login-psw" class="input-field" placeholder="Kata Sandi" autocomplete="off" onkeydown="if(event.key==='Enter') handleLogin()" />
         </div>
-        <button type="button" class="btn btn-primary" onclick="handleLogin()">Masuk</button>
+        <button type="button" id="btn-login" class="btn btn-primary" onclick="handleLogin()">Masuk</button>
         <div id="login-error" class="error-msg"></div>
       </div>
     </div>
@@ -1647,7 +1647,7 @@
     function exportCigCSV() {
       const rows = [["Tanggal", "Jam", "Detail Penjualan Rokok", "Omzet", "Laba Bersih"]];
       state.transactions.filter(function(t) { return t.category === "Rokok"; }).forEach(function(t) {
-        rows.push([t.date, t.time, '"' + t.detail.replace(/"/g, '""') + '"', t.amount, t.profit]);
+        rows.push([t.date, t.time, '"' + t.detail.split('"').join('""') + '"', t.amount, t.profit]);
       });
       downloadCSV(rows, "laporan-rokok-kartama-" + new Date().toISOString().slice(0, 10) + ".csv");
     }
@@ -1657,7 +1657,7 @@
       const rows = [["Tanggal", "Jam", "Kategori", "Detail", "Total", "Laba/Masuk Kas"]];
       const source = role === "admin" ? state.transactions.filter(function(t) { return t.category !== "Rokok"; }) : state.transactions;
       source.forEach(function(t) {
-        rows.push([t.date, t.time, t.category, '"' + t.detail.replace(/"/g, '""') + '"', t.amount, t.profit]);
+        rows.push([t.date, t.time, t.category, '"' + t.detail.split('"').join('""') + '"', t.amount, t.profit]);
       });
       downloadCSV(rows, "laporan-kartama-point-" + new Date().toISOString().slice(0, 10) + ".csv");
     }
@@ -1703,8 +1703,29 @@
       }
     }, 1000);
 
-    loadState();
-    if (state.user) initApp();
+    function bootApp() {
+      try {
+        loadState();
+        if (state.user) {
+          initApp();
+        }
+      } catch (e) {
+        console.error("Boot error:", e);
+      }
+      var btnLogin = document.getElementById("btn-login");
+      if (btnLogin) {
+        btnLogin.addEventListener("click", function(e) {
+          e.preventDefault();
+          handleLogin();
+        });
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootApp);
+    } else {
+      bootApp();
+    }
   </script>
 </body>
 </html>
